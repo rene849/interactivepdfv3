@@ -12,7 +12,7 @@
   --blue:#2E45B8; --teal:#36E2BD; --cream:#EBE9E0;
   --ink:#0f172a; --muted:#5a5f73; --rule:#d7d9e0;
   --maxw:1320px;
-  --screen-height:650px;}
+  --screen-height:580px;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
 body{font-family:'Noto Sans',Arial,sans-serif;background:#fff;
@@ -198,14 +198,9 @@ html,body{overflow-x:hidden;}
 .tl-wrap{padding:clamp(8px,1vw,12px) 0;flex:none;width:100%;}
 .tl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
 .tl-scroll::-webkit-scrollbar{display:none;}
-.tl-track{
-  display:flex;
-  align-items:center; /* centres connector line with circle midpoints */
-  padding:8px 30px 8px 10px; /* horizontal buffer stops the active node's ring/scale being clipped at either end */
-  min-width:max-content;
-}
+.tl-track{display:flex;align-items:center;padding:8px 30px 8px 10px;min-width:max-content;}
 /* Connector line: flex:1 stretches between nodes; align-self:center keeps it mid-circle */
-.tl-conn{flex:1;min-width:clamp(2px,0.5vw,14px);height:2px;background:rgba(31,46,122,.25);align-self:center;margin:0;}
+.tl-conn{flex:1;min-width:clamp(2px,0.5vw,14px);height:2px;background:rgba(31,46,122,.25);align-self:center;margin:auto 0;}
 .tl-node{flex:none;display:flex;flex-direction:column;align-items:center;gap:5px;}
 /* Number inside circle: white text, blue border only */
 .tl-btn{
