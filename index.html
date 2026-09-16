@@ -96,7 +96,7 @@ html,body{overflow-x:hidden;}
   grid-area:1/1;align-self:center;justify-self:stretch;
   width:100%;aspect-ratio:1340/530;
   pointer-events:none;z-index:1;
-}
+;max-height:260px;}
 .cover-art-inner{
   position:relative;width:100%;aspect-ratio:1340/530;
 }
@@ -157,7 +157,7 @@ html,body{overflow-x:hidden;}
 .intro-copy p:last-child{margin-bottom:0;}
 .intro-bg{
   grid-area:1/1;align-self:center;justify-self:stretch;
-  position:relative;width:100%;aspect-ratio:1200/495;z-index:0;pointer-events:none;
+  position:relative;width:100%;aspect-ratio:1200/380;z-index:0;pointer-events:none;
 }
 .intro-bg svg{width:100%;height:100%;display:block;overflow:visible;}
 .intro-path .road{fill:none;stroke:var(--blue);stroke-width:1.8;
@@ -195,13 +195,13 @@ html,body{overflow-x:hidden;}
 .ev-illo-inner svg,.ev-illo-inner img{width:100%;height:100%;display:block;object-fit:contain;}
 
 /* ── TIMELINE STRIP ── */
-.tl-wrap{padding:clamp(10px,1.5vw,16px) 0 clamp(8px,1vw,12px);flex:none;}
+.tl-wrap{padding:clamp(8px,1vw,12px) 0;flex:none;}
 .tl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
 .tl-scroll::-webkit-scrollbar{display:none;}
 .tl-track{
   display:flex;
   align-items:center; /* centres connector line with circle midpoints */
-  padding:8px 10px; /* horizontal buffer stops the active node's ring/scale being clipped at either end */
+  padding:8px 30px 8px 10px; /* horizontal buffer stops the active node's ring/scale being clipped at either end */
   min-width:max-content;
 }
 /* Connector line: flex:1 stretches between nodes; align-self:center keeps it mid-circle */
