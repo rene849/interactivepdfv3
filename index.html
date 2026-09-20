@@ -119,6 +119,14 @@ html,body{overflow-x:hidden;}
 }
 .thumb svg,.thumb img{width:100%;height:100%;object-fit:contain;display:block;}
 .thumb.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
+
+/* Slow down cover animation to match intro slide */
+.cover-art svg circle,
+.cover-art svg ellipse,
+.cover-art svg g {
+  animation: dotPulse 3s ease-in-out infinite !important;
+}
+
 @keyframes floaty{
   0%,100%{transform:translate(-50%,-50%) translateY(0);}
   50%{transform:translate(-50%,-50%) translateY(-7px);}
@@ -126,7 +134,7 @@ html,body{overflow-x:hidden;}
 .thumb.show{animation:floaty 5s ease-in-out infinite;}
 
 /* ── INTRO & EVENT: shared scrollable content area ── */
-.work-outer{flex:1;overflow-y:hidden;overflow-x:hidden;}
+.work-outer{;overflow-y:hidden;overflow-x:hidden;}
 .work-inner{
   max-width:var(--maxw);
   margin:0 auto;
@@ -191,7 +199,7 @@ html,body{overflow-x:hidden;}
 .ev-illo-inner{
   width:100%;max-width:360px;
   aspect-ratio:1/1;display:grid;place-items:center;
-}
+;min-height:260px;max-height:280px;}
 .ev-illo-inner svg,.ev-illo-inner img{width:100%;height:100%;display:block;object-fit:contain;}
 
 /* ── TIMELINE STRIP ── */
@@ -200,7 +208,7 @@ html,body{overflow-x:hidden;}
 .tl-scroll::-webkit-scrollbar{display:none;}
 .tl-track{display:flex;align-items:center;padding:8px 30px 8px 10px;min-width:max-content;}
 /* Connector line: flex:1 stretches between nodes; align-self:center keeps it mid-circle */
-.tl-conn{flex:1;min-width:clamp(2px,0.5vw,14px);height:2px;background:rgba(31,46,122,.25);align-self:center;margin:auto 0;}
+.tl-conn{flex:1;min-width:clamp(2px,0.5vw,14px);height:2px;background:rgba(31,46,122,.25);position:relative;top:-1px;}
 .tl-node{flex:none;display:flex;flex-direction:column;align-items:center;gap:5px;}
 /* Number inside circle: white text, blue border only */
 .tl-btn{
