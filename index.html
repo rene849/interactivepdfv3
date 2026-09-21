@@ -27,7 +27,13 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;touch-acti
 html,body{overflow-x:hidden;;overflow-y:hidden;}
 .screen{display:none;}
 /* height:100vh + overflow:hidden creates the stacking context for sticky */
-.screen.is-active{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+.screen.is-active{display:flex;flex-direction:column;
+  /* IMPORTANT: never use vh/dvh here. Inside an iframe, 100vh == the iframe's
+     own height, and the parent resizes the iframe to match this page's height
+     (+ a buffer). height:100vh therefore creates an endless grow loop
+     (iframe grows -> 100vh grows -> body grows -> report -> iframe grows...).
+     A fixed px min-height keeps the timeline anchored without that loop. */
+  height:auto;min-height:620px;overflow:hidden;}
 
 /* ── APPBAR ── */
 .appbar{
@@ -136,7 +142,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 
 /* ── INTRO & EVENT: shared scrollable content area ── */
 /* Fills all space between appbar and tl-wrap. Content scrolls if needed. */
-.work-outer{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;}
+.work-outer{flex:1 0 auto;min-height:0;overflow:visible;}
 .work-inner{
   max-width:var(--maxw);
   width:100%;
@@ -164,7 +170,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 .intro-body{
   position:relative;display:grid;
   /* Never taller than the space between appbar and timeline bar */
-  max-height:calc(100vh - 60px - 80px - clamp(16px,3vw,32px));
+  /* no vh-based cap (see .screen.is-active) - art sizes from its own width */
   flex:1;
 }
 .intro-copy{
@@ -315,6 +321,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 @media(max-width:560px){
   html,body{overflow:auto;height:auto;}
   .screen{overflow:visible;}
+  .screen.is-active{min-height:0;}
   #cover{overflow:visible;}   /* beat the desktop #cover{overflow:hidden} ID rule */
   .work-outer{overflow:visible;flex:none;}
   .work-inner{padding:0 20px 0;}
