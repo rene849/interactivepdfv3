@@ -24,9 +24,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;touch-acti
    Screens size to their real content (not a fixed 100vh) so the iframe can
    be resized to match exactly — no leftover white space, no internal
    scrollbar. See the height-reporting script near the end of the file. */
-html,body{overflow-x:hidden;}
-.screen{display:flex;flex-direction:column;overflow:hidden;height:580px !important;position:relative;}
-.screen.is-active{display:flex;height:580px !important;}
+html,body{overflow-x:hidden;;overflow-y:hidden;}
+.screen{display:none;}
+/* height:100vh + overflow:hidden creates the stacking context for sticky */
+.screen.is-active{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
 
 /* ── APPBAR ── */
 .appbar{
@@ -134,8 +135,17 @@ html,body{overflow-x:hidden;}
 .thumb.show{animation:floaty 5s ease-in-out infinite;}
 
 /* ── INTRO & EVENT: shared scrollable content area ── */
-.work-outer{flex:1;overflow-y:hidden;overflow-x:hidden;;}
+/* Fills all space between appbar and tl-wrap. Content scrolls if needed. */
+.work-outer{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;}
 .work-inner{
+  max-width:var(--maxw);
+  width:100%;
+  margin:0 auto;
+  padding:clamp(8px,2vw,20px) clamp(18px,4vw,52px) clamp(16px,2vw,24px);
+  display:flex;
+  flex-direction:column;
+}
+.tl-inner{
   max-width:var(--maxw);
   margin:0 auto;
   padding:clamp(8px,2vw,20px) clamp(18px,4vw,52px) 0;
@@ -152,7 +162,10 @@ html,body{overflow-x:hidden;}
    height, which is what let the art spill past the bottom and overlap the
    timeline below it. */
 .intro-body{
-  position:relative;display:grid;min-height:260px;
+  position:relative;display:grid;
+  /* Never taller than the space between appbar and timeline bar */
+  max-height:calc(100vh - 60px - 80px - clamp(16px,3vw,32px));
+  flex:1;
 }
 .intro-copy{
   grid-area:1/1;align-self:center;justify-self:start;
@@ -165,7 +178,8 @@ html,body{overflow-x:hidden;}
 .intro-copy p:last-child{margin-bottom:0;}
 .intro-bg{
   grid-area:1/1;align-self:center;justify-self:stretch;
-  position:relative;width:100%;aspect-ratio:1200/340;z-index:0;pointer-events:none;
+  position:relative;width:100%;aspect-ratio:1200/465;
+  max-height:100%;z-index:0;pointer-events:none;overflow:hidden;
 }
 .intro-bg svg{width:100%;height:100%;display:block;overflow:visible;}
 .intro-path .road{fill:none;stroke:var(--blue);stroke-width:1.8;
@@ -203,18 +217,46 @@ html,body{overflow-x:hidden;}
 .ev-illo-inner svg,.ev-illo-inner img{width:100%;height:100%;display:block;object-fit:contain;}
 
 /* ── TIMELINE STRIP ── */
-.tl-wrap{padding:8px 0 0 0;flex:0 0 auto;width:100%;margin-top:auto;}
-.tl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+/* Timeline sits at the bottom of the screen as a flex child (margin-top:auto
+   pushes it down). A max-width wrapper aligns it with the content columns.  */
+/* Direct flex child of .screen — sits permanently between
+   work-outer and the screen bottom, never moves with content. */
+.tl-wrap{
+  flex:none;
+  width:100%;
+  background:#fff;
+  padding:12px 0 14px;
+  overflow:visible;
+}
+.tl-inner-wrap{
+  max-width:var(--maxw);
+  margin:0 auto;
+  padding:0 clamp(18px,4vw,52px);
+}
+.tl-scroll{
+  overflow-x:hidden; /* track fills 100% width, no horizontal scroll needed */
+  overflow-y:visible;
+  width:100%;
+}
 .tl-scroll::-webkit-scrollbar{display:none;}
-.tl-track{display:flex;align-items:center;padding:0 30px 0 10px;min-width:max-content;height:20px;gap:0;}
-/* Connector line: flex:1 stretches between nodes; align-self:center keeps it mid-circle */
-.tl-conn{flex:1;min-width:clamp(2px,0.5vw,14px);height:2px;background:rgba(31,46,122,.25);align-self:center;margin:0;}
-.tl-node{flex:none;display:flex;flex-direction:column;align-items:center;gap:2px;}
-/* Number inside circle: white text, blue border only */
+/* align-items:flex-start + margin-top on connector centres line on the button */
+.tl-track{
+  display:flex;align-items:flex-start;
+  /* width:100% + no min-width: nodes spread to fill the content width */
+  width:100%;
+  padding:4px 2px 6px;
+}
+.tl-conn{
+  flex:1;
+  height:2px;background:rgba(31,46,122,.25);
+  /* Centre on 40px button: (40/2)-(2/2) = 19px */
+  margin-top:19px;
+}
+.tl-node{flex:none;display:flex;flex-direction:column;align-items:center;gap:4px;}
 .tl-btn{
-  width:clamp(22px,4.6vw,40px);height:clamp(22px,4.6vw,40px);
+  width:40px;height:40px;
   border-radius:50%;border:1.5px solid var(--blue);background:#fff;
-  color:var(--blue);font-weight:700;font-size:clamp(10px,1.1vw,13px);
+  color:var(--blue);font-weight:700;font-size:13px;
   flex-shrink:0;display:grid;place-items:center;cursor:pointer;
   transition:background .2s,color .2s,box-shadow .2s,transform .18s;
 }
@@ -223,11 +265,11 @@ html,body{overflow-x:hidden;}
 .tl-btn.active{
   background:var(--navy-deep)!important;color:#fff!important;
   border-color:var(--navy-deep);
-  box-shadow:0 0 0 3.5px var(--teal),0 4px 12px rgba(20,31,82,.25);
-  transform:scale(1.08);
+  /* Teal ring without scale — scale causes layout shift when clicking */
+  box-shadow:0 0 0 3.5px var(--teal),0 2px 8px rgba(20,31,82,.2);
+  transform:none;
 }
-.tl-year{font-size:clamp(9px,1vw,11px);font-weight:700;line-height:1.3;color:var(--ink);white-space:nowrap;}
-/* Title label hidden on desktop (only shown in mobile vertical list) */
+.tl-year{font-size:11px;font-weight:700;color:var(--ink);margin-top:3px;white-space:nowrap;}
 .tl-label{display:none;}
 .tl-node-text{display:flex;flex-direction:column;align-items:center;}
 
@@ -12942,7 +12984,11 @@ html,body{overflow-x:hidden;}
 </svg></div>
   <div data-ill="2020"><svg id="y2020-root" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 271.3 271.5"
 	 xml:space="preserve">
-<style>#y2020-root .st0{fill:#141F52;}#y2020-root .st1{fill:#1F2E7A;}#y2020-root .st2{fill:#475ED1;}#y2020-root .st3{clip-path:url(#y2020-SVGID_2_);fill:#475ED1;}#y2020-root .st4{fill:#1DC9A4;}#y2020-root .st5{fill:#36E2BD;}#y2020-root .st6{fill:#63EAC6;}#y2020-root .st7{opacity:0.2;fill:#E9FCF8;}#y2020-root .st8{fill:#C91D42;}#y2020-root .st9{fill:#D2F9F0;}#y2020-root .st10{clip-path:url(#SVGID_4_);fill:#475ED1;}</style>
+<style>#y2020-root .st0{fill:#141F52;}#y2020-root .st1{fill:#1F2E7A;}#y2020-root .st2{fill:#475ED1;}#y2020-root .st3{clip-path:url(#y2020-SVGID_2_);fill:#475ED1;}#y2020-root .st4{fill:#1DC9A4;}#y2020-root .st5{fill:#36E2BD;}#y2020-root .st6{fill:#63EAC6;}#y2020-root .st7{opacity:0.2;fill:#E9FCF8;}#y2020-root .st8{fill:#C91D42;}#y2020-root .st9{fill:#D2F9F0;}#y2020-root .st10{clip-path:url(#SVGID_4_);fill:#475ED1;}
+/* Timeline visible within iframe bounds */
+body{overflow-y:hidden;}
+
+</style>
 <defs>
 </defs>
 <circle class="st0" cx="129.2" cy="137.2" r="129.2"/>
@@ -15145,18 +15191,21 @@ html,body{overflow-x:hidden;}
       <h1 class="screen-title">The lead-up to the US-China rivalry</h1>
       <div class="intro-body">
         <div class="intro-bg" aria-hidden="true">
-          <svg id="introSvg" class="intro-path" viewBox="0 0 1200 495" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"></svg>
+          <svg id="introSvg" class="intro-path" viewBox="0 0 1200 465" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
         <div class="intro-copy">
           <p id="introDesc">In the preceding decades, various events occurred that culminated in the US-China rivalry.</p>
           <p>To understand how the rivalry reached its current state, <strong>click on each event</strong> in the timeline below.</p>
         </div>
       </div>
-      <div class="tl-wrap" role="navigation" aria-label="Event timeline">
-        <div class="tl-scroll"><div class="tl-track" id="introTrack"></div></div>
-      </div>
       <!-- Mobile-only accordion timeline (built by JS) -->
       <div id="mobileTimeline" class="acc" role="list" aria-label="Event timeline"></div>
+    </div>
+  </div>
+  <!-- Timeline anchored as direct screen child — never inside scroll area -->
+  <div class="tl-wrap" role="navigation" aria-label="Event timeline">
+    <div class="tl-inner-wrap">
+      <div class="tl-scroll"><div class="tl-track" id="introTrack"></div></div>
     </div>
   </div>
 </div>
@@ -15196,9 +15245,12 @@ html,body{overflow-x:hidden;}
           <div class="ev-illo-inner" id="evIlloInner"></div>
         </div>
       </div>
-      <div class="tl-wrap" role="navigation" aria-label="Event timeline">
-        <div class="tl-scroll"><div class="tl-track" id="eventTrack"></div></div>
-      </div>
+    </div>
+  </div>
+  <!-- Timeline anchored as direct screen child — never inside scroll area -->
+  <div class="tl-wrap" role="navigation" aria-label="Event timeline">
+    <div class="tl-inner-wrap">
+      <div class="tl-scroll"><div class="tl-track" id="eventTrack"></div></div>
     </div>
   </div>
 </div>
@@ -15428,7 +15480,7 @@ function animateCover(){
    matching the cover road's proportions/height, instead of just stretching
    an unchanged shape into a taller box (which would reintroduce empty
    canvas margin, the same bug the cover artwork had). */
-var INTRO_D = "M 0 15 H 884 a31 31 0 0 1 0 62 H 720 a49 49 0 0 0 0 98 H 980 a62 62 0 0 1 0 124 H 720 a80 80 0 0 0 0 160 H 1199";
+var INTRO_D = "M 0 25 H 870 a55 55 0 0 1 0 110 H 530 a55 55 0 0 0 0 110 H 900 a55 55 0 0 1 0 110 H 530 a55 55 0 0 0 0 110 H 1199";
 var DOTS=[
   {t:.205,r:6},{t:.315,r:14},{t:.430,r:6},{t:.505,r:8},
   {t:.600,r:7},{t:.700,r:8},{t:.800,r:6},{t:.880,r:8},
@@ -15605,10 +15657,24 @@ function setActive(activeId){
       btn.classList.toggle('active', m.id===activeId);
       btn.classList.toggle('visited', !!(visited[m.id] && m.id!==activeId));
     });
-    // Scroll active into view
+    // Scroll ONLY the .tl-scroll container — never the page.
+    // Only scroll if the active button is outside the visible scroll area.
     if(activeId>0){
       var act=document.getElementById('tl-'+tid+'-'+activeId);
-      if(act) act.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+      if(act){
+        var scrollEl=act.closest('.tl-scroll');
+        if(scrollEl){
+          var btnLeft=act.offsetLeft;
+          var btnRight=btnLeft+act.offsetWidth;
+          var visLeft=scrollEl.scrollLeft;
+          var visRight=visLeft+scrollEl.clientWidth;
+          // Only scroll if button is partially or fully outside view
+          if(btnLeft<visLeft || btnRight>visRight){
+            var targetScroll=btnLeft-(scrollEl.clientWidth/2)+(act.offsetWidth/2);
+            scrollEl.scrollTo({left:Math.max(0,targetScroll),behavior:'smooth'});
+          }
+        }
+      }
     }
   });
 }
