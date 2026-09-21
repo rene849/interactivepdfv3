@@ -198,6 +198,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 
 /* ── EVENT columns ── */
 .work-body{
+  flex:1 0 auto; /* fill the space above the timeline so .ev-illo can centre in it */
   display:grid;
   grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);
   gap:clamp(20px,4vw,56px);
@@ -216,11 +217,11 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 .ev-rule{height:1px;background:var(--rule);margin:14px 0 16px;}
 .ev-desc{font-size:clamp(13px,1.2vw,15px);line-height:1.72;color:var(--ink);}
 
-.ev-illo{display:flex;justify-content:center;align-items:flex-start;padding-top:clamp(4px,1vw,12px);}
+.ev-illo{display:flex;justify-content:center;align-items:center;
+  align-self:center; /* vertically centre the artwork in the space between the header rule and the timeline */}
 .ev-illo-inner{
-  width:100%;max-width:360px;
-  aspect-ratio:1/1;display:grid;place-items:center;
-;min-height:260px;max-height:280px;}
+  width:100%;max-width:340px;
+  aspect-ratio:1/1;display:grid;place-items:center;}
 .ev-illo-inner svg,.ev-illo-inner img{width:100%;height:100%;display:block;object-fit:contain;}
 
 /* ── TIMELINE STRIP ── */
@@ -15374,43 +15375,33 @@ function injectClear(id, ill){
   el.innerHTML = '';
   inject(el, ill);
 }
-/* Event illustrations were inconsistent in two real ways, confirmed by
-   measuring each asset's actual drawn content (ignoring faint decorative
-   background like clouds/skylines):
-     1. Different assets fill very different amounts of their own canvas,
-        and by very different SHAPES (e.g. 1950's soldier is a tall
-        portrait bust-shot, while 1949's map+flag is wide/landscape) — a
-        formula matching "whichever dimension is bigger" compared the
-        wrong axes against each other for portrait-shaped assets and badly
-        oversized them (this was the bug behind 1950/1972 rendering too
-        big and too high). This version matches by total visual AREA
-        instead, which stays sane across mismatched orientations, and
-        every scale/position correction is capped so it can never push an
-        asset's content past the edges of its box, however the math works
-        out — verified by actually rendering each result and checking it,
-        not by trusting the formula alone.
-     2. Some assets' artwork isn't centered in its own canvas at all —
-        1950/1979/2008 are all shifted noticeably downward internally,
-        which is the "drop" you were seeing.
-   1949 (china) is the reference and is left completely untouched, exactly
-   as you approved it. Every other asset gets a specific, capped scale +
-   position correction measured against it — not a shared formula. */
+/* Event illustrations: normalised so they read as a consistent set.
+   Each asset's drawn artwork (ignoring the faint decorative clouds/skylines)
+   was measured in the 340px event box, then given a scale + offset that
+     1. centres the artwork in the box, both horizontally and vertically
+        (several assets sat high/low inside their own canvas), and
+     2. sizes it by visual AREA (target ~255px equivalent), capped so its
+        longest side never exceeds ~316px, so wide shapes (ships, boot) and
+        tall/round ones (globes, Eiffel tower) look similarly weighty
+        without being forced to an identical size.
+   Offsets are in px relative to the 340px reference box and are scaled to
+   the real container width at runtime. */
 var ILLO_FIX = {
-  'china': {s:1.000, x:0.0,  y:0.0},
-  '1950':  {s:1.148, x:-4.0, y:-51.1},
-  '1960':  {s:1.080, x:18.3, y:-4.9},
-  '1971':  {s:0.960, x:-3.2, y:-38.7},
-  '1972':  {s:0.906, x:-7.2, y:-16.8},
-  '1979':  {s:1.121, x:-1.7, y:-37.9},
-  '1991':  {s:1.154, x:-5.9, y:9.7},
-  '2000':  {s:1.157, x:4.6,  y:-18.9},
-  '2001':  {s:0.992, x:2.6,  y:-5.3},
-  '2008':  {s:1.069, x:-0.1, y:-49.1},
-  '2013':  {s:0.872, x:-3.0, y:-25.7},
-  '2015':  {s:0.960, x:-3.2, y:-50.7},
-  '2016':  {s:1.019, x:-8.6, y:2.5},
-  '2018':  {s:1.097, x:3.4,  y:27.1},
-  '2020':  {s:0.863, x:-3.1, y:-24.7}
+  'china': {s:0.870, x:2.6, y:20.5},
+  '1950': {s:0.998, x:-0.5, y:-24.0},
+  '1960': {s:1.046, x:19.9, y:19.9},
+  '1971': {s:0.929, x:-0.0, y:-12.5},
+  '1972': {s:0.778, x:-0.0, y:-0.0},
+  '1979': {s:0.972, x:1.5, y:-10.7},
+  '1991': {s:0.991, x:-2.0, y:25.8},
+  '2000': {s:0.868, x:-0.0, y:-3.5},
+  '2001': {s:0.943, x:2.4, y:15.6},
+  '2008': {s:0.992, x:3.0, y:-20.8},
+  '2013': {s:0.962, x:-0.0, y:10.6},
+  '2015': {s:0.929, x:-0.0, y:-23.2},
+  '2016': {s:0.886, x:-4.4, y:13.7},
+  '2018': {s:0.901, x:5.0, y:27.5},
+  '2020': {s:0.750, x:-0.0, y:-0.0}
 };
 function sizeIlloToAsset(containerId, assetName){
   var container = document.getElementById(containerId);
@@ -15431,7 +15422,7 @@ function sizeIlloToAsset(containerId, assetName){
   // any width, and pointer-events:none removes any risk of the artwork
   // ever intercepting a click regardless.
   var actualWidth = container.getBoundingClientRect().width || 360;
-  var REF = 360;
+  var REF = 340;
   var ratio = actualWidth / REF;
   var x = fix.x * ratio, y = fix.y * ratio;
   svg.style.transform = 'translate('+x.toFixed(1)+'px,'+y.toFixed(1)+'px) scale('+fix.s.toFixed(3)+')';
