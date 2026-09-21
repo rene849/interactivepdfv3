@@ -294,7 +294,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 }
 .bib-head{
   padding:18px 24px 14px;border-bottom:1px solid var(--rule);
-  display:flex;align-items:center;justify-content:space-between;flex:none;
+  display:flex;align-items:center;justify-between;flex:none;
 }
 .bib-head h2{font-size:18px;font-weight:700;}
 .bib-close{
@@ -308,7 +308,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 .bib-entry{margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--rule);}
 .bib-entry:last-child{border:none;margin:0;padding:0;}
 
-/* Dynamic smooth height transitions to prevent visual jumping during iframe updates */
+/* Dynamic height transition to prevent iframe jumps */
 iframe.iframe-interactive {
   transition: height 0.3s ease-in-out;
 }
@@ -448,6 +448,430 @@ iframe.iframe-interactive {
 <!--  
 Interactive pdfs
 -->
+
+<!-- ── APPBAR ── -->
+<div class="appbar">
+  <div class="appbar-inner">
+    <div class="appbar-logo" id="logo-holder"></div>
+    <div class="appbar-divider"></div>
+    <div class="appbar-title">The lead-up to the US-China rivalry</div>
+    <div class="appbar-tools">
+      <button class="icon-btn" id="btn-bib" title="Bibliography / Sources">
+        <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+      </button>
+      <button class="icon-btn" id="btn-reset" title="Restart Timeline">
+        <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── SCREEN 1: COVER ── -->
+<div class="screen is-active" id="cover">
+  <div class="cover-stage">
+    <div class="cover-text">
+      <h1 class="cover-title">The lead-up to the US-China rivalry</h1>
+      <button class="btn-start" id="btn-start">Start</button>
+    </div>
+    
+    <div class="cover-art">
+      <div class="cover-art-inner">
+        <svg class="cover-path" viewBox="0 0 1340 530" preserveAspectRatio="none">
+          <path class="road" d="M 120 420 C 350 420, 380 110, 670 110 C 960 110, 990 420, 1220 420"></path>
+          <!-- Arrowhead pointing right at path end -->
+          <path class="arrowhead" d="M 1210 412 L 1225 420 L 1210 428"></path>
+          
+          <circle class="node" cx="210" cy="385" r="5"></circle>
+          <circle class="node" cx="340" cy="225" r="5"></circle>
+          <circle class="node" cx="490" cy="115" r="5"></circle>
+          <circle class="node" cx="670" cy="110" r="5"></circle>
+          <circle class="node" cx="850" cy="115" r="5"></circle>
+          <circle class="node" cx="1000" cy="225" r="5"></circle>
+          <circle class="node" cx="1130" cy="385" r="5"></circle>
+        </svg>
+
+        <!-- Floating Thumbnail Badges -->
+        <div class="thumb" style="left:15.6%; top:72.6%;" data-ill-ref="china"></div>
+        <div class="thumb" style="left:25.3%; top:42.4%;" data-ill-ref="ussr"></div>
+        <div class="thumb" style="left:36.5%; top:21.6%;" data-ill-ref="helmet"></div>
+        <div class="thumb" style="left:50.0%; top:20.7%;" data-ill-ref="plane"></div>
+        <div class="thumb" style="left:63.4%; top:21.6%;" data-ill-ref="globe"></div>
+        <div class="thumb" style="left:74.6%; top:42.4%;" data-ill-ref="money"></div>
+      </div>
+    </div>
+
+    <!-- Mobile-Only Cover Art (smaller S-curve layout) -->
+    <div class="cover-art-mobile">
+      <svg class="cover-path" viewBox="0 0 340 180" preserveAspectRatio="xMidYMid meet">
+        <path class="road" d="M 20 140 C 90 140, 100 40, 170 40 C 240 40, 250 140, 320 140"></path>
+        <path class="arrowhead" d="M 310 133 L 323 140 L 310 147"></path>
+      </svg>
+      <div class="thumb show" style="left:23.5%; top:61.1%;" data-ill-ref="china"></div>
+      <div class="thumb show" style="left:50.0%; top:22.2%;" data-ill-ref="plane"></div>
+      <div class="thumb show" style="left:76.5%; top:61.1%;" data-ill-ref="money"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SCREEN 2: INTRO ── -->
+<div class="screen" id="intro">
+  <div class="work-outer">
+    <div class="work-inner">
+      <h1 class="screen-title">The lead-up to the US-China rivalry</h1>
+      <div class="intro-body">
+        <div class="intro-copy">
+          <p>The strategic competition between the United States and China is one of the defining features of contemporary international relations. However, this rivalry did not emerge overnight; it is the product of decades of geopolitical shifts, economic transformations, and evolving strategic calculations.</p>
+          <p>Explore this interactive timeline to examine key historical turning points that shaped the trajectory of US-China relations, leading up to the intense competition seen today.</p>
+        </div>
+        <div class="intro-bg">
+          <svg class="intro-path" viewBox="0 0 1200 465" preserveAspectRatio="none">
+            <path class="road" d="M 80 370 C 280 370, 310 95, 600 95 C 890 95, 920 370, 1120 370"></path>
+            <path class="arrowhead" d="M 1110 362 L 1125 370 L 1110 378"></path>
+
+            <circle class="ndot faint" cx="160" cy="335" r="4.5"></circle>
+            <circle class="ndot faint" cx="280" cy="200" r="4.5"></circle>
+            <circle class="ndot faint" cx="430" cy="100" r="4.5"></circle>
+            <circle class="ndot faint" cx="600" cy="95" r="4.5"></circle>
+            <circle class="ndot faint" cx="770" cy="100" r="4.5"></circle>
+            <circle class="ndot faint" cx="920" cy="200" r="4.5"></circle>
+            <circle class="ndot faint" cx="1040" cy="335" r="4.5"></circle>
+          </svg>
+        </div>
+      </div>
+      
+      <!-- Accordion (Mobile Only) -->
+      <div class="acc" id="mobile-acc"></div>
+    </div>
+  </div>
+
+  <!-- Shared Timeline Strip at screen bottom -->
+  <div class="tl-wrap">
+    <div class="tl-inner-wrap">
+      <div class="tl-scroll">
+        <div class="tl-track" id="tl-track-intro"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SCREEN 3: EVENT ── -->
+<div class="screen" id="event">
+  <div class="work-outer">
+    <div class="work-inner">
+      <h1 class="screen-title">The lead-up to the US-China rivalry</h1>
+      <div class="work-body fade" id="event-body">
+        <div class="ev-text">
+          <div class="ev-head">
+            <div class="ev-year" id="ev-year">1949</div>
+            <div class="ev-title" id="ev-title">Event Title</div>
+          </div>
+          <div class="ev-rule"></div>
+          <div class="ev-desc" id="ev-desc">Description text goes here...</div>
+        </div>
+        <div class="ev-illo">
+          <div class="ev-illo-inner" id="ev-illo-holder"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shared Timeline Strip at screen bottom -->
+  <div class="tl-wrap">
+    <div class="tl-inner-wrap">
+      <div class="tl-scroll">
+        <div class="tl-track" id="tl-track-event"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── BIBLIOGRAPHY MODAL ── -->
+<div class="bib-overlay" id="bib-modal" aria-hidden="true">
+  <div class="bib-box" role="dialog" aria-labelledby="bib-heading">
+    <div class="bib-head">
+      <h2 id="bib-heading">Sources & Bibliography</h2>
+      <button class="bib-close" id="bib-close" title="Close modal">&times;</button>
+    </div>
+    <div class="bib-body">
+      <div class="bib-entry">
+        <strong>1949: The Chinese Communist Revolution</strong><br>
+        Westad, O. A. (2012). <em>Restless Empire: China and the World Since 1750</em>. Basic Books.
+      </div>
+      <div class="bib-entry">
+        <strong>1950: The Sino-Soviet Treaty & Korean War</strong><br>
+        Christensen, T. J. (1996). <em>Useful Adversaries: Grand Strategy, Domestic Mobilization, and Sino-American Conflict, 1947–1958</em>. Princeton University Press.
+      </div>
+      <div class="bib-entry">
+        <strong>1960: The Sino-Soviet Split</strong><br>
+        Lüthi, L. M. (2008). <em>The Sino-Soviet Split: Cold War in the Communist World</em>. Princeton University Press.
+      </div>
+      <div class="bib-entry">
+        <strong>1971: Rapprochement & Ping-Pong Diplomacy</strong><br>
+        Kissinger, H. (2011). <em>On China</em>. Penguin Press.
+      </div>
+      <div class="bib-entry">
+        <strong>1972: Nixon’s Visit to China</strong><br>
+        MacMillan, M. (2007). <em>Nixon and Mao: The Week That Changed the World</em>. Random House.
+      </div>
+      <div class="bib-entry">
+        <strong>1979: Normalization & The Taiwan Relations Act</strong><br>
+        Vogel, E. F. (2011). <em>Deng Xiaoping and the Transformation of China</em>. Harvard University Press.
+      </div>
+      <div class="bib-entry">
+        <strong>2001: China Joins the WTO</strong><br>
+        Lardy, N. R. (2002). <em>Integrating China into the Global Economy</em>. Brookings Institution Press.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── DATA & APP LOGIC ── -->
+<script>
+const EVENTS = [
+  {
+    id: '1949',
+    year: '1949',
+    title: 'The Chinese Communist Revolution',
+    ill: 'china',
+    desc: 'The Chinese Communist Party (CCP), led by Mao Zedong, established the People\'s Republic of China (PRC) after defeating the US-backed Nationalist Party (KMT) in the Chinese Civil War. The defeated Nationalists retreated to Taiwan, laying the foundation for long-standing tensions over Taiwan\'s political status. The US refused to diplomatically recognize the PRC, maintaining ties with the Nationalist government in Taiwan instead.'
+  },
+  {
+    id: '1950',
+    year: '1950',
+    title: 'The Sino-Soviet Alliance & Korean War',
+    ill: 'ussr',
+    desc: 'China signed a Treaty of Friendship, Alliance, and Mutual Assistance with the Soviet Union, solidifying its position in the communist bloc during the Cold War. Later that year, Chinese troops entered the Korean War to support North Korea against US and UN forces, marking direct military confrontation between the US and China and deepening mutual hostility for decades.'
+  },
+  {
+    id: '1960',
+    year: '1960',
+    title: 'The Sino-Soviet Split',
+    ill: 'helmet',
+    desc: 'Ideological disagreements, disputes over military strategy, and personal rivalry between Mao Zedong and Soviet leader Nikita Khrushchev led to a formal rift between Beijing and Moscow. The split created a tri-polar Cold War dynamic, opening a strategic opportunity for the US to later exploit division within the communist bloc.'
+  },
+  {
+    id: '1971',
+    year: '1971',
+    title: 'Ping-Pong Diplomacy & Secret Visits',
+    ill: 'plane',
+    desc: 'Seeking a counterweight to Soviet power, China signaled an openness to dialogue through "ping-pong diplomacy." US National Security Advisor Henry Kissinger made a secret visit to Beijing, paving the way for diplomatic opening and a dramatic shift in Cold War alignment.'
+  },
+  {
+    id: '1972',
+    year: '1972',
+    title: 'Nixon\'s Historic Visit to China',
+    ill: 'globe',
+    desc: 'President Richard Nixon visited China, meeting with Mao Zedong and issuing the Shanghai Communiqué. The visit initiated a period of strategic alignment against the Soviet Union and established the framework for managing sensitive issues, including Taiwan, through the "One China" policy.'
+  },
+  {
+    id: '1979',
+    year: '1979',
+    title: 'Diplomatic Normalization & Reform Era',
+    ill: 'money',
+    desc: 'The US and PRC formally established diplomatic relations, shifting official US recognition from Taipei to Beijing. Concurrently, China under Deng Xiaoping launched economic reforms ("Reform and Opening-up"), initiating an era of rapid economic integration with global markets and deep trade ties with the US.'
+  },
+  {
+    id: '2001',
+    year: '2001',
+    title: 'China\'s Accession to the WTO',
+    ill: 'globe',
+    desc: 'With US backing, China joined the World Trade Organization (WTO). Washington anticipated that economic integration would encourage domestic market reforms and integrate China into the liberal international order. Instead, China leveraged access to global markets to become the world\'s second-largest economy and a industrial powerhouse, setting the stage for contemporary economic competition.'
+  }
+];
+
+// App State
+let currentIndex = -1; // -1 = Intro screen, 0..N = Event screens
+const visitedSet = new Set();
+
+// Element References
+const screens = {
+  cover: document.getElementById('cover'),
+  intro: document.getElementById('intro'),
+  event: document.getElementById('event')
+};
+
+function initApp() {
+  injectAssets();
+  buildTimelineTracks();
+  buildMobileAccordion();
+  bindEvents();
+}
+
+function injectAssets() {
+  const logoTpl = document.querySelector('[data-ill="logo"]');
+  if (logoTpl) {
+    document.getElementById('logo-holder').innerHTML = logoTpl.innerHTML;
+  }
+  document.querySelectorAll('.thumb').forEach(el => {
+    const key = el.getAttribute('data-ill-ref');
+    const svgTpl = document.querySelector(`[data-ill="${key}"]`);
+    if (svgTpl) el.innerHTML = svgTpl.innerHTML;
+  });
+}
+
+function buildTimelineTrack(trackEl) {
+  trackEl.innerHTML = '';
+
+  // "Intro" node first
+  const introNode = document.createElement('div');
+  introNode.className = 'tl-node';
+  introNode.innerHTML = `
+    <button class="tl-btn ${currentIndex === -1 ? 'active' : ''}" data-idx="-1" title="Introduction">I</button>
+    <div class="tl-node-text"><span class="tl-year">Intro</span></div>
+  `;
+  trackEl.appendChild(introNode);
+
+  EVENTS.forEach((ev, idx) => {
+    const conn = document.createElement('div');
+    conn.className = 'tl-conn';
+    trackEl.appendChild(conn);
+
+    const node = document.createElement('div');
+    node.className = 'tl-node';
+    const isVisited = visitedSet.has(idx) && idx !== currentIndex;
+    const isActive = idx === currentIndex;
+    
+    node.innerHTML = `
+      <button class="tl-btn ${isActive ? 'active' : ''} ${isVisited ? 'visited' : ''}" data-idx="${idx}" title="${ev.year}: ${ev.title}">${idx + 1}</button>
+      <div class="tl-node-text"><span class="tl-year">${ev.year}</span></div>
+    `;
+    trackEl.appendChild(node);
+  });
+}
+
+function buildTimelineTracks() {
+  buildTimelineTrack(document.getElementById('tl-track-intro'));
+  buildTimelineTrack(document.getElementById('tl-track-event'));
+}
+
+function buildMobileAccordion() {
+  const accEl = document.getElementById('mobile-acc');
+  accEl.innerHTML = '';
+
+  EVENTS.forEach((ev, idx) => {
+    const item = document.createElement('div');
+    item.className = 'acc-item';
+    item.id = `acc-item-${idx}`;
+
+    const svgTpl = document.querySelector(`[data-ill="${ev.ill}"]`);
+    const illoHtml = svgTpl ? svgTpl.innerHTML : '';
+
+    item.innerHTML = `
+      <button class="acc-row" data-acc-idx="${idx}">
+        <div class="acc-numwrap"><div class="acc-num">${idx + 1}</div></div>
+        <div class="acc-meta">
+          <span class="acc-year">${ev.year}</span>
+          <span class="acc-title">${ev.title}</span>
+        </div>
+      </button>
+      <div class="acc-panel">
+        <div class="acc-illo">
+          <div class="acc-badge">${idx + 1}</div>
+          <div class="acc-illo-inner">${illoHtml}</div>
+        </div>
+        <div class="acc-year-lg">${ev.year}</div>
+        <div class="acc-title-lg">${ev.title}</div>
+        <div class="acc-desc">${ev.desc}</div>
+      </div>
+    `;
+    accEl.appendChild(item);
+  });
+}
+
+function bindEvents() {
+  document.getElementById('btn-start').addEventListener('click', () => goToScreen(-1));
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.tl-btn');
+    if (btn) {
+      const idx = parseInt(btn.getAttribute('data-idx'), 10);
+      goToScreen(idx);
+      return;
+    }
+
+    const accBtn = e.target.closest('.acc-row');
+    if (accBtn) {
+      const idx = parseInt(accBtn.getAttribute('data-acc-idx'), 10);
+      toggleAccordionItem(idx);
+    }
+  });
+
+  // Bibliography Modal
+  const bibModal = document.getElementById('bib-modal');
+  document.getElementById('btn-bib').addEventListener('click', () => {
+    bibModal.classList.add('open');
+    bibModal.setAttribute('aria-hidden', 'false');
+  });
+  document.getElementById('bib-close').addEventListener('click', () => {
+    bibModal.classList.remove('open');
+    bibModal.setAttribute('aria-hidden', 'true');
+  });
+  bibModal.addEventListener('click', (e) => {
+    if (e.target === bibModal) {
+      bibModal.classList.remove('open');
+      bibModal.setAttribute('aria-hidden', 'true');
+    }
+  });
+
+  // Reset
+  document.getElementById('btn-reset').addEventListener('click', () => {
+    visitedSet.clear();
+    goToScreen(-1);
+  });
+}
+
+function goToScreen(index) {
+  currentIndex = index;
+  if (index >= 0) visitedSet.add(index);
+
+  Object.values(screens).forEach(s => s.classList.remove('is-active'));
+
+  if (index === -1) {
+    screens.intro.classList.add('is-active');
+  } else {
+    screens.event.classList.add('is-active');
+    renderEventContent(index);
+  }
+
+  buildTimelineTracks();
+  window.scrollTo(0, 0);
+}
+
+function renderEventContent(idx) {
+  const ev = EVENTS[idx];
+  const bodyEl = document.getElementById('event-body');
+  
+  bodyEl.style.opacity = '0';
+  
+  setTimeout(() => {
+    document.getElementById('ev-year').textContent = ev.year;
+    document.getElementById('ev-title').textContent = ev.title;
+    document.getElementById('ev-desc').textContent = ev.desc;
+
+    const svgTpl = document.querySelector(`[data-ill="${ev.ill}"]`);
+    document.getElementById('ev-illo-holder').innerHTML = svgTpl ? svgTpl.innerHTML : '';
+    
+    bodyEl.style.opacity = '1';
+  }, 100);
+}
+
+function toggleAccordionItem(idx) {
+  const item = document.getElementById(`acc-item-${idx}`);
+  if (!item) return;
+  const isOpen = item.classList.contains('open');
+
+  document.querySelectorAll('.acc-item').forEach(el => el.classList.remove('open'));
+
+  if (!isOpen) {
+    item.classList.add('open');
+    visitedSet.add(idx);
+    buildTimelineTracks();
+  }
+}
+
+// Initial Kickoff
+initApp();
+</script>
 
 <script>
 (function() {
