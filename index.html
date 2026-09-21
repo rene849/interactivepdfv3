@@ -142,7 +142,8 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 
 /* ── INTRO & EVENT: shared scrollable content area ── */
 /* Fills all space between appbar and tl-wrap. Content scrolls if needed. */
-.work-outer{flex:1 0 auto;min-height:0;overflow:visible;}
+.work-outer{flex:1 0 auto;min-height:0;overflow:visible;display:flex;flex-direction:column;}
+.work-outer>.work-inner{flex:1 0 auto;}
 .work-inner{
   max-width:var(--maxw);
   width:100%;
@@ -184,7 +185,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 .intro-copy p:last-child{margin-bottom:0;}
 .intro-bg{
   grid-area:1/1;align-self:center;justify-self:stretch;
-  position:relative;width:100%;aspect-ratio:1200/465;
+  position:relative;width:100%;aspect-ratio:1200/300;
   max-height:100%;z-index:0;pointer-events:none;overflow:hidden;
 }
 .intro-bg svg{width:100%;height:100%;display:block;overflow:visible;}
@@ -15198,7 +15199,7 @@ body{overflow-y:hidden;}
       <h1 class="screen-title">The lead-up to the US-China rivalry</h1>
       <div class="intro-body">
         <div class="intro-bg" aria-hidden="true">
-          <svg id="introSvg" class="intro-path" viewBox="0 0 1200 465" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"></svg>
+          <svg id="introSvg" class="intro-path" viewBox="0 0 1200 300" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
         <div class="intro-copy">
           <p id="introDesc">In the preceding decades, various events occurred that culminated in the US-China rivalry.</p>
@@ -15487,11 +15488,11 @@ function animateCover(){
    matching the cover road's proportions/height, instead of just stretching
    an unchanged shape into a taller box (which would reintroduce empty
    canvas margin, the same bug the cover artwork had). */
-var INTRO_D = "M 0 25 H 870 a55 55 0 0 1 0 110 H 530 a55 55 0 0 0 0 110 H 900 a55 55 0 0 1 0 110 H 530 a55 55 0 0 0 0 110 H 1199";
+var INTRO_D = "M 0 30 H 940 a60 60 0 0 1 0 120 H 600 a60 60 0 0 0 0 120 H 1199";
 var DOTS=[
-  {t:.205,r:6},{t:.315,r:14},{t:.430,r:6},{t:.505,r:8},
-  {t:.600,r:7},{t:.700,r:8},{t:.800,r:6},{t:.880,r:8},
-  {t:.930,r:13},{t:.972,r:5,faint:true}
+  {t:.150,r:6},{t:.280,r:8},{t:.460,r:14},{t:.580,r:6},
+  {t:.690,r:8},{t:.780,r:7},{t:.850,r:6},{t:.900,r:8},
+  {t:.955,r:12},{t:.985,r:5,faint:true}
 ];
 var introDrawn = false;
 
