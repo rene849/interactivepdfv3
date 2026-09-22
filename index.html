@@ -242,7 +242,10 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
   padding:0 clamp(18px,4vw,52px);
 }
 .tl-scroll{
-  overflow-x:hidden; /* track fills 100% width, no horizontal scroll needed */
+  overflow-x:visible; /* track fills 100% width, no horizontal scroll needed.
+    (was hidden — that clipped the active button's teal ring on the FIRST
+    and LAST node, since the ring extends past the button box but the box
+    sat flush against this container's edge with almost no margin) */
   overflow-y:visible;
   width:100%;
 }
@@ -252,7 +255,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
   display:flex;align-items:flex-start;
   /* width:100% + no min-width: nodes spread to fill the content width */
   width:100%;
-  padding:4px 2px 6px;
+  padding:4px 6px 6px; /* was 2px sides — 6px clears the active ring's halo */
 }
 .tl-conn{
   flex:1;
@@ -320,6 +323,21 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
    Lowered from 700px so a laptop with a Moodle side menu open (which can
    shrink the iframe below the old 700px threshold) stays in the laptop
    layout — reserved now for genuinely small/phone screens. */
+/* ── TABLET BAND (e.g. iPad Mini portrait, ~561–900px): still the
+   desktop-style layout (horizontal timeline, side-by-side event columns —
+   both already checked fine at this width), but the intro screen's S-curve
+   is an absolutely-sized overlay behind the text, and at this width the
+   text wraps onto enough extra lines to run down into the curve's lanes.
+   Stack text above a smaller, centred curve instead, same as the logic
+   mobile already uses one step further down. ── */
+@media(min-width:561px) and (max-width:900px){
+  .intro-body{display:block;}
+  .intro-copy{max-width:none;margin-bottom:18px;}
+  .intro-bg{
+    position:relative;width:100%;max-width:480px;margin:0 auto;
+  }
+}
+
 @media(max-width:560px){
   html,body{overflow:auto;height:auto;}
   .screen{overflow:visible;}
@@ -416,20 +434,18 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 
   /* expanded panel */
   .acc-panel{display:none;padding:8px 0 20px;}
-  .acc-item.open .acc-row{display:none;}
   .acc-item.open .acc-panel{display:block;}
+  .acc-item.open .acc-row{cursor:pointer;}
+  .acc-item.open .acc-num{
+    background:var(--navy-deep);color:#fff;border-color:var(--navy-deep);
+    box-shadow:0 0 0 3px var(--teal);
+  }
   .acc-illo{
     position:relative;width:100%;max-width:260px;margin:4px auto 16px;
     aspect-ratio:1/1;
   }
   .acc-illo-inner{width:100%;height:100%;display:grid;place-items:center;}
   .acc-illo-inner svg,.acc-illo-inner img{width:100%;height:100%;object-fit:contain;display:block;}
-  .acc-badge{
-    position:absolute;left:0;top:0;width:40px;height:40px;border-radius:50%;
-    background:var(--navy-deep);color:#fff;font-weight:700;font-size:14px;
-    display:grid;place-items:center;z-index:2;
-    box-shadow:0 0 0 3px var(--teal);
-  }
   .acc-year-lg{font-size:26px;font-weight:800;color:var(--red);line-height:1;margin-bottom:6px;}
   .acc-title-lg{font-size:18px;font-weight:800;color:var(--ink);line-height:1.25;margin-bottom:12px;}
   .acc-desc{font-size:14px;line-height:1.7;color:var(--ink);}
@@ -15608,10 +15624,9 @@ function buildAccordion(){
     /* expanded panel */
     var panel=document.createElement('div'); panel.className='acc-panel';
     var illo=document.createElement('div'); illo.className='acc-illo';
-    var badge=document.createElement('span'); badge.className='acc-badge'; badge.textContent=m.id;
     var illoInner=document.createElement('div'); illoInner.className='acc-illo-inner';
     illoInner.id='acc-illo-'+m.id;
-    illo.appendChild(badge); illo.appendChild(illoInner);
+    illo.appendChild(illoInner);
 
     var yrLg=document.createElement('div'); yrLg.className='acc-year-lg'; yrLg.textContent=m.year;
     var tlLg=document.createElement('div'); tlLg.className='acc-title-lg'; tlLg.textContent=m.title;
