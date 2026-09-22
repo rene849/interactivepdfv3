@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Tell browsers this page is light-mode only. Prevents the OS/browser
+     dark-mode from inverting the background and desaturating the SVG
+     illustrations, which were designed for a white canvas.             -->
+<meta name="color-scheme" content="only light">
 <title>The lead-up to the US-China rivalry</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -12,7 +16,12 @@
   --blue:#2E45B8; --teal:#36E2BD; --cream:#EBE9E0;
   --ink:#0f172a; --muted:#5a5f73; --rule:#d7d9e0;
   --maxw:1320px;
-  --screen-height:580px;}
+  --screen-height:580px;
+  /* Force light rendering — illustrations designed for white background */
+  color-scheme: only light;
+}
+/* Belt-and-braces: lock background/text even if UA dark styles slip through */
+html, body{background:#fff !important;color:#0f172a !important;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
 body{font-family:'Noto Sans',Arial,sans-serif;background:#fff;
@@ -457,6 +466,30 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
   .thumb{transition:none!important;animation:none!important;}
   .fade{transition:none!important;}
   *{animation-duration:.001ms!important;}
+}
+
+/* Dark-mode fallback — for browsers/WebViews that apply forced dark styles
+   despite color-scheme:only light (common on Android Chrome in some
+   versions). We don't invert or retheme; we just nudge brightness and
+   saturation back toward the designed appearance.
+   The appbar and timeline keep their white background via the explicit
+   background:#fff rules already in place; this filter targets only the
+   illustration artwork containers where the shift is most visible.      */
+@media(prefers-color-scheme:dark){
+  .ev-illo-inner,
+  .acc-illo-inner,
+  .thumb,
+  .cover-art-inner,
+  .cover-art-mobile{
+    filter:brightness(1.08) saturate(1.12);
+  }
+  /* Ensure the page background stays white — some WebViews override it */
+  .screen.is-active,
+  .appbar,
+  .work-outer,
+  .tl-wrap{
+    background:#fff !important;
+  }
 }
 
 </style>
