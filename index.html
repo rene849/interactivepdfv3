@@ -127,13 +127,6 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 .thumb svg,.thumb img{width:100%;height:100%;object-fit:contain;display:block;}
 .thumb.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
 
-/* Slow down cover animation to match intro slide */
-.cover-art svg circle,
-.cover-art svg ellipse,
-.cover-art svg g {
-  animation: dotPulse 3s ease-in-out infinite !important;
-}
-
 @keyframes floaty{
   0%,100%{transform:translate(-50%,-50%) translateY(0);}
   50%{transform:translate(-50%,-50%) translateY(-7px);}
@@ -142,7 +135,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 
 /* ── INTRO & EVENT: shared scrollable content area ── */
 /* Fills all space between appbar and tl-wrap. Content scrolls if needed. */
-.work-outer{flex:1 0 auto;min-height:0;overflow:visible;display:flex;flex-direction:column;}
+.work-outer{flex:1 0 auto;min-height:0;overflow:hidden;display:flex;flex-direction:column;}
 .work-outer>.work-inner{flex:1 0 auto;}
 .work-inner{
   max-width:var(--maxw);
@@ -152,16 +145,9 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
   display:flex;
   flex-direction:column;
 }
-.tl-inner{
-  max-width:var(--maxw);
-  margin:0 auto;
-  padding:clamp(8px,2vw,20px) clamp(18px,4vw,52px) 0;
-  display:flex;
-  flex-direction:column;
-  min-height:100%;
-}
-/* Intro needs a touch more headroom so the S-curve clears the appbar */
-#intro .work-inner{padding-top:clamp(16px,3vw,32px);}
+/* .tl-inner removed — HTML uses .tl-inner-wrap (see below) */
+/* Intro: extra top padding centres content between appbar and timeline */
+#intro .work-inner{padding-top:clamp(28px,5vw,64px);}
 
 /* ── INTRO: S-curve panel ──
    Grid-stacked (like the cover) so intro-body's height is set by the art's
@@ -179,7 +165,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
   position:relative;z-index:2;max-width:clamp(280px,44%,520px);
 }
 .intro-copy p{
-  font-size:clamp(15px,1.4vw,18px);line-height:1.68;
+  font-size:clamp(13px,1.2vw,15px);line-height:1.72;
   color:var(--ink);font-weight:400;margin-bottom:16px;
 }
 .intro-copy p:last-child{margin-bottom:0;}
@@ -288,7 +274,12 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 .fade{transition:opacity .2s ease;}
 
 /* ── MOBILE-ONLY ELEMENTS (hidden on desktop) ── */
-.screen-title{display:none;}
+/* Off-screen visually but present in the AT tree — heading-key
+   navigation now lands on this screen correctly. */
+.screen-title{
+  position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
+}
 .acc{display:none;}
 
 /* ── BIB MODAL ── */
@@ -467,6 +458,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
   .fade{transition:none!important;}
   *{animation-duration:.001ms!important;}
 }
+
 </style>
 </head>
 <body>
@@ -15476,23 +15468,36 @@ function animateCover(){
   var arrow  = document.getElementById('coverArrow');
   var nodes  = document.getElementById('coverSvg').querySelectorAll('.node');
   var thumbs = ['th-china','th-helmet','th-plane','th-ussr','th-globe'];
+  var reduced = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
 
   var L = road.getTotalLength();
   road.style.strokeDasharray  = L;
-  road.style.strokeDashoffset = L;
-  road.animate([{strokeDashoffset:L},{strokeDashoffset:0}],
-    {duration:1700,easing:'cubic-bezier(.6,.05,.25,1)',fill:'forwards'});
-  arrow.animate([{opacity:0},{opacity:1}],{duration:300,delay:1600,fill:'forwards'});
-  nodes.forEach(function(n,i){
-    n.animate([{opacity:0,transform:'scale(.2)'},{opacity:1,transform:'scale(1)'}],
-      {duration:420,delay:500+i*180,fill:'forwards'});
-  });
-  thumbs.forEach(function(id,i){
-    setTimeout(function(){
+
+  if(reduced){
+    // Immediately show everything — no motion at all
+    road.style.strokeDashoffset = '0';
+    arrow.style.opacity = '1';
+    nodes.forEach(function(n){ n.style.opacity='1'; n.style.transform='scale(1)'; });
+    thumbs.forEach(function(id){
       var el = document.getElementById(id);
       if(el) el.classList.add('show');
-    }, 650+i*150);
-  });
+    });
+  } else {
+    road.style.strokeDashoffset = L;
+    road.animate([{strokeDashoffset:L},{strokeDashoffset:0}],
+      {duration:1700,easing:'cubic-bezier(.6,.05,.25,1)',fill:'forwards'});
+    arrow.animate([{opacity:0},{opacity:1}],{duration:300,delay:1600,fill:'forwards'});
+    nodes.forEach(function(n,i){
+      n.animate([{opacity:0,transform:'scale(.2)'},{opacity:1,transform:'scale(1)'}],
+        {duration:420,delay:500+i*180,fill:'forwards'});
+    });
+    thumbs.forEach(function(id,i){
+      setTimeout(function(){
+        var el = document.getElementById(id);
+        if(el) el.classList.add('show');
+      }, 650+i*150);
+    });
+  }
 }
 
 /* ── Intro S-curve ─────────────────────────────────────────────
@@ -15514,6 +15519,7 @@ function drawIntro(){
   introDrawn = true;
   var NS='http://www.w3.org/2000/svg';
   var svg = document.getElementById('introSvg');
+  var reduced = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
   svg.innerHTML='';
 
   var path = document.createElementNS(NS,'path');
@@ -15522,9 +15528,15 @@ function drawIntro(){
   svg.appendChild(path);
   var L = path.getTotalLength();
   path.style.strokeDasharray = L;
-  path.style.strokeDashoffset = L;
-  path.animate([{strokeDashoffset:L},{strokeDashoffset:0}],
-    {duration:1700,easing:'cubic-bezier(.6,.05,.25,1)',fill:'forwards'});
+
+  if(reduced){
+    // Show path immediately, no draw-in animation
+    path.style.strokeDashoffset = '0';
+  } else {
+    path.style.strokeDashoffset = L;
+    path.animate([{strokeDashoffset:L},{strokeDashoffset:0}],
+      {duration:1700,easing:'cubic-bezier(.6,.05,.25,1)',fill:'forwards'});
+  }
 
   // Arrow
   var ep=path.getPointAtLength(L), pp=path.getPointAtLength(L-6);
@@ -15533,28 +15545,35 @@ function drawIntro(){
   var arr=document.createElementNS(NS,'path');
   arr.setAttribute('d','M '+pt(.5)+' L '+ep.x+','+ep.y+' L '+pt(-.5));
   arr.setAttribute('class','arrowhead');
-  arr.style.opacity='0';
-  arr.animate([{opacity:0},{opacity:1}],{duration:300,delay:1600,fill:'forwards'});
+  arr.style.opacity = reduced ? '1' : '0';
+  if(!reduced){
+    arr.animate([{opacity:0},{opacity:1}],{duration:300,delay:1600,fill:'forwards'});
+  }
   svg.appendChild(arr);
 
-  // Animated dots
+  // Dots — static at reduced motion, pulsing otherwise
   DOTS.forEach(function(spec,i){
     var p2=path.getPointAtLength(L*spec.t);
-    var c=document.createElementNS(NS,'circle');
-    c.setAttribute('cx',p2.x.toFixed(1));
-    c.setAttribute('cy',p2.y.toFixed(1));
-    c.setAttribute('r',spec.r);
-    c.setAttribute('class','ndot'+(spec.faint?' faint':''));
-    c.style.opacity='0';
+    var circ=document.createElementNS(NS,'circle');
+    circ.setAttribute('cx',p2.x.toFixed(1));
+    circ.setAttribute('cy',p2.y.toFixed(1));
+    circ.setAttribute('r',spec.r);
+    circ.setAttribute('class','ndot'+(spec.faint?' faint':''));
     var peak=spec.faint?0.5:1;
-    c.animate([
-      {opacity:0,transform:'scale(0)'},
-      {opacity:peak,transform:'scale(1)',offset:.10},
-      {opacity:peak,transform:'scale(1)',offset:.74},
-      {opacity:0,transform:'scale(0)',offset:.88},
-      {opacity:0,transform:'scale(0)'}
-    ],{duration:5200,delay:700+i*230,iterations:Infinity});
-    svg.appendChild(c);
+    if(reduced){
+      // Just show dots statically — no pulse loop
+      circ.style.opacity = peak;
+    } else {
+      circ.style.opacity='0';
+      circ.animate([
+        {opacity:0,transform:'scale(0)'},
+        {opacity:peak,transform:'scale(1)',offset:.10},
+        {opacity:peak,transform:'scale(1)',offset:.74},
+        {opacity:0,transform:'scale(0)',offset:.88},
+        {opacity:0,transform:'scale(0)'}
+      ],{duration:5200,delay:700+i*230,iterations:Infinity});
+    }
+    svg.appendChild(circ);
   });
 }
 
@@ -15727,6 +15746,9 @@ function selectEvent(id){
 
 /* ── Navigation ──────────────────────────────────────────────── */
 function goIntro(){
+  // Reset so S-curve always redraws when returning to intro screen
+  introDrawn = false;
+  document.getElementById('introSvg').innerHTML = '';
   show('intro');
   drawIntro();
   setActive(-1);
@@ -15738,16 +15760,43 @@ function goHome(){
   show('cover');
 }
 
-/* ── Bibliography ────────────────────────────────────────────── */
+/* ── Bibliography — with focus trap and focus return ─────────── */
+var _bibOpener = null; // tracks which button opened the modal
+
 function openBib(){
-  document.getElementById('bibModal').classList.add('open');
+  _bibOpener = document.activeElement; // remember so we can return focus
+  var modal = document.getElementById('bibModal');
+  modal.classList.add('open');
   document.querySelector('.bib-close').focus();
 }
+
 function closeBib(){
   document.getElementById('bibModal').classList.remove('open');
+  // Return focus to whichever button opened the modal
+  if(_bibOpener && typeof _bibOpener.focus === 'function'){
+    _bibOpener.focus();
+    _bibOpener = null;
+  }
 }
+
 document.getElementById('bibModal').addEventListener('click',function(e){
   if(e.target===this) closeBib();
+});
+
+// Focus trap: keep Tab/Shift+Tab inside the modal while it is open
+document.getElementById('bibModal').addEventListener('keydown',function(e){
+  if(!this.classList.contains('open')) return;
+  if(e.key !== 'Tab') return;
+  var focusable = Array.from(this.querySelectorAll(
+    'a[href],button:not([disabled]),input,select,textarea,[tabindex]:not([tabindex="-1"])'
+  )).filter(function(el){ return el.offsetParent !== null; });
+  if(!focusable.length) return;
+  var first = focusable[0], last = focusable[focusable.length-1];
+  if(e.shiftKey){
+    if(document.activeElement === first){ e.preventDefault(); last.focus(); }
+  } else {
+    if(document.activeElement === last){ e.preventDefault(); first.focus(); }
+  }
 });
 
 /* ── Keyboard nav ────────────────────────────────────────────── */
@@ -15755,10 +15804,21 @@ document.addEventListener('keydown',function(e){
   if(e.key==='Escape'){ closeBib(); return; }
   var ev=document.getElementById('event');
   if(!ev.classList.contains('is-active')) return;
+
+  // Only intercept arrow keys when focus is on a timeline button or on
+  // the body/screen itself — not when focus is inside text, inputs, or
+  // any other interactive element the user is deliberately interacting with.
+  var active = document.activeElement;
+  var onTimeline = active && active.classList.contains('tl-btn');
+  var onBody = !active || active === document.body || active === document.documentElement;
+  if(!onTimeline && !onBody) return;
+
   var idx=MS.findIndex(function(m){return m.id===currentId;});
   if(e.key==='ArrowRight'||e.key==='ArrowDown'){
+    e.preventDefault();
     if(idx<MS.length-1) selectEvent(MS[idx+1].id);
   } else if(e.key==='ArrowLeft'||e.key==='ArrowUp'){
+    e.preventDefault();
     if(idx>0) selectEvent(MS[idx-1].id);
   }
 });
