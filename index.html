@@ -325,17 +325,23 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
    layout — reserved now for genuinely small/phone screens. */
 /* ── TABLET BAND (e.g. iPad Mini portrait, ~561–900px): still the
    desktop-style layout (horizontal timeline, side-by-side event columns —
-   both already checked fine at this width), but the intro screen's S-curve
-   is an absolutely-sized overlay behind the text, and at this width the
-   text wraps onto enough extra lines to run down into the curve's lanes.
-   Stack text above a smaller, centred curve instead, same as the logic
-   mobile already uses one step further down. ── */
+   both already checked fine at this width). The intro screen's decorative
+   S-curve is dropped at this width, same as mobile: there isn't enough
+   spare height for it once the text wraps onto extra lines, and it isn't
+   essential to using the timeline, so hiding it (rather than shrinking and
+   stacking it) gives the instructional text the full width and keeps the
+   screen compact. The 15-node timeline strip itself is also tightened a
+   touch — smaller circles/year text and a smaller minimum side margin —
+   so all 15 nodes keep comfortable, even spacing instead of crowding. ── */
 @media(min-width:561px) and (max-width:900px){
   .intro-body{display:block;}
-  .intro-copy{max-width:none;margin-bottom:18px;}
-  .intro-bg{
-    position:relative;width:100%;max-width:480px;margin:0 auto;
-  }
+  .intro-copy{max-width:none;margin-bottom:0;}
+  .intro-bg{display:none;}
+
+  .tl-inner-wrap{padding:0 clamp(10px,2.4vw,28px);}
+  .tl-btn{width:34px;height:34px;font-size:12px;}
+  .tl-year{font-size:10px;}
+  .tl-conn{margin-top:16px;}
 }
 
 @media(max-width:560px){
