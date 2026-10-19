@@ -44,7 +44,13 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
      min-height ensures the timeline never floats too high on
      narrow-but-tall viewports (e.g. tablet portrait).              */
   height:auto;
-  min-height:min(620px, 90vw); /* 90vw = approx portrait tablet height */
+  min-height:min(590px, 90vw); /* 90vw = approx portrait tablet height */
+}
+
+/* Narrower tablet / split-screen widths: event text wraps taller, so keep the
+   original 620px minimum here to avoid a height change between events. */
+@media (max-width:799px){
+  .screen.is-active{min-height:min(620px, 90vw);}
 }
 
 /* ── APPBAR ── */
@@ -67,20 +73,22 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
   padding:0 16px;font-size:14px;font-weight:500;color:var(--ink);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .appbar-tools{display:flex;align-items:center;gap:8px;flex:none;}
-/* Icon buttons: proper circle with correct SVG sizing */
+/* Icon buttons: the design's circular icons (rest / hover / pressed) drawn as SVG.
+   Colours come from custom properties so one set of shapes serves every state. */
 .icon-btn{
-  width:36px;height:36px;border-radius:50%;
-  border:1.5px solid var(--blue);display:grid;place-items:center;
-  color:var(--blue);background:#fff;cursor:pointer;
-  transition:background .15s,color .15s;flex:none;
+  --ring:#2E45B8; --ring-fill:transparent; --glyph:#2E45B8;
+  width:36px;height:36px;padding:0;border:0;background:none;
+  cursor:pointer;flex:none;display:block;border-radius:50%;
+  transition:none;
 }
-.icon-btn:hover,.icon-btn:focus-visible{background:var(--blue);color:#fff;}
-.icon-btn svg{
-  width:16px;height:16px;
-  fill:none;stroke:currentColor;
-  stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;
-  overflow:visible;display:block;
-}
+.icon-btn svg{width:100%;height:100%;display:block;overflow:visible;}
+.icon-btn .ring{fill:var(--ring-fill);stroke:var(--ring);stroke-width:1;}
+.icon-btn .glyph{fill:var(--glyph);}
+.icon-btn .xglyph{fill:none;stroke:var(--glyph);stroke-width:2;stroke-linecap:butt;}
+/* hover + keyboard focus: pale fill, navy outline (Home_over / Bibliography_over / Close_over) */
+.icon-btn:hover,.icon-btn:focus-visible{--ring:#1f2e7a;--ring-fill:#ebedfa;--glyph:#1f2e7a;}
+/* pressed: teal outline, no fill (Home_pressed / Bibliography_pressed / Close_pressed) */
+.icon-btn:active{--ring:#1dc9a4;--ring-fill:transparent;--glyph:#1f2e7a;}
 
 /* ── COVER ── */
 #cover{overflow:hidden;}
@@ -90,7 +98,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
     set automatically by its tallest item (the art), which sizes itself
     from its own width via aspect-ratio — no guessed buffer needed at any
     container width, unlike a fixed aspect-ratio on the stage itself. */
-  padding:clamp(16px,3vw,40px) clamp(18px,4vw,52px);
+  padding:clamp(12px,2vw,24px) clamp(18px,4vw,52px);
   overflow:hidden;
 }
 .cover-text{
@@ -310,16 +318,11 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
   display:flex;align-items:center;justify-content:space-between;flex:none;
 }
 .bib-head h2{font-size:18px;font-weight:700;}
-.bib-close{
-  width:34px;height:34px;border-radius:50%;border:1.5px solid var(--navy);
-  display:grid;place-items:center;color:var(--navy);background:#fff;
-  font-size:22px;cursor:pointer;line-height:1;
-  transition:background .15s,color .15s;
-}
-.bib-close:hover{background:var(--navy);color:#fff;}
-.bib-body{padding:18px 24px;overflow-y:auto;font-size:13.5px;line-height:1.72;color:var(--muted);}
-.bib-entry{margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--rule);}
-.bib-entry:last-child{border:none;margin:0;padding:0;}
+.bib-close{flex:none;} /* circular icon styling comes from .icon-btn */
+.bib-body{padding:18px 24px;overflow-y:auto;font-size:clamp(13px,1.2vw,15px);line-height:1.72;color:var(--ink);font-weight:400;}
+/* Hanging indent: first line flush left, wrapped lines indented; no rules between entries */
+.bib-entry{margin:0 0 14px;padding:0 0 0 24px;text-indent:-24px;border:0;}
+.bib-entry:last-child{margin-bottom:0;}
 
 /* ── MOBILE ≤560px ──
    Lowered from 700px so a laptop with a Moodle side menu open (which can
@@ -362,8 +365,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
   .appbar-divider{display:none;}
   .appbar-title{display:none;}              /* title moves into body as H1 */
   .appbar-tools{flex:1 1 100%;justify-content:space-between;padding:12px 0 14px;gap:0;}
-  .icon-btn{width:46px;height:46px;}
-  .icon-btn svg{width:20px;height:20px;}
+  .icon-btn{width:40px;height:40px;}
 
   /* Body H1 (replaces the appbar title on mobile) */
   .screen-title{
@@ -15229,13 +15231,13 @@ body{overflow-y:hidden;}
       <span class="appbar-title">The lead-up to the US-China rivalry</span>
       <div class="appbar-tools">
         <button class="icon-btn" onclick="goIntro()" aria-label="Return to timeline">
-          <svg viewBox="0 0 22 22"><path d="M3 9.5L11 3l8 6.5V19a1 1 0 01-1 1H14v-5H8v5H4a1 1 0 01-1-1z"/></svg>
+          <svg viewBox="0 0 33 33" aria-hidden="true" focusable="false"><path class="ring" d="M16.5,32.5a16,16,0,1,0-16-16,16,16,0,0,0,16,16"/><polygon class="glyph" points="14.92 22.43 14.92 17.68 18.08 17.68 18.08 22.43 22.04 22.43 22.04 16.1 24.41 16.1 16.5 8.98 8.59 16.1 10.96 16.1 10.96 22.43 14.92 22.43"/></svg>
         </button>
         <button class="icon-btn" onclick="openBib()" aria-label="Open bibliography">
-          <svg viewBox="0 0 22 22"><path d="M4 4h6a2 2 0 0 1 2 2v12a1.5 1.5 0 0 0-1.5-1.5H4z"/><path d="M18 4h-6a2 2 0 0 0-2 2v12a1.5 1.5 0 0 1 1.5-1.5H18z"/></svg>
+          <svg viewBox="0 0 32.83 32.83" aria-hidden="true" focusable="false"><path class="ring" d="M16.41,32.33A15.92,15.92,0,1,0,.5,16.41,15.92,15.92,0,0,0,16.41,32.33"/><path class="glyph" d="M22.66,20.23a8.16,8.16,0,0,0-2.43-.35,8.38,8.38,0,0,0-3.82,1V13a8.38,8.38,0,0,1,3.82-1,8.16,8.16,0,0,1,2.43.34Zm0-9.37a8.3,8.3,0,0,0-2.43-.34,6.5,6.5,0,0,0-3.82,1,6.45,6.45,0,0,0-3.81-1,6.5,6.5,0,0,0-3.82,1V21.72a.38.38,0,0,0,.35.35c.07,0,.1,0,.17,0a8.5,8.5,0,0,1,3.3-.76,6.45,6.45,0,0,1,3.81,1,8.38,8.38,0,0,1,3.82-1,7.12,7.12,0,0,1,3.3.73.34.34,0,0,0,.17,0,.38.38,0,0,0,.35-.34V11.56a5,5,0,0,0-1.39-.7"/></svg>
         </button>
         <button class="icon-btn" onclick="goHome()" aria-label="Exit to start">
-          <svg viewBox="0 0 22 22"><path d="M5 5l12 12M17 5L5 17"/></svg>
+          <svg viewBox="0 0 32.83 32.83" aria-hidden="true" focusable="false"><path class="ring" d="M16.41,32.33A15.92,15.92,0,1,0,.5,16.41,15.92,15.92,0,0,0,16.41,32.33"/><path class="xglyph" d="M22.02,10.8L10.81,22.02M10.81,10.8L22.02,22.02"/></svg>
         </button>
       </div>
     </div>
@@ -15271,13 +15273,13 @@ body{overflow-y:hidden;}
       <span class="appbar-title">The lead-up to the US-China rivalry</span>
       <div class="appbar-tools">
         <button class="icon-btn" onclick="goIntro()" aria-label="Return to timeline">
-          <svg viewBox="0 0 22 22"><path d="M3 9.5L11 3l8 6.5V19a1 1 0 01-1 1H14v-5H8v5H4a1 1 0 01-1-1z"/></svg>
+          <svg viewBox="0 0 33 33" aria-hidden="true" focusable="false"><path class="ring" d="M16.5,32.5a16,16,0,1,0-16-16,16,16,0,0,0,16,16"/><polygon class="glyph" points="14.92 22.43 14.92 17.68 18.08 17.68 18.08 22.43 22.04 22.43 22.04 16.1 24.41 16.1 16.5 8.98 8.59 16.1 10.96 16.1 10.96 22.43 14.92 22.43"/></svg>
         </button>
         <button class="icon-btn" onclick="openBib()" aria-label="Open bibliography">
-          <svg viewBox="0 0 22 22"><path d="M4 4h6a2 2 0 0 1 2 2v12a1.5 1.5 0 0 0-1.5-1.5H4z"/><path d="M18 4h-6a2 2 0 0 0-2 2v12a1.5 1.5 0 0 1 1.5-1.5H18z"/></svg>
+          <svg viewBox="0 0 32.83 32.83" aria-hidden="true" focusable="false"><path class="ring" d="M16.41,32.33A15.92,15.92,0,1,0,.5,16.41,15.92,15.92,0,0,0,16.41,32.33"/><path class="glyph" d="M22.66,20.23a8.16,8.16,0,0,0-2.43-.35,8.38,8.38,0,0,0-3.82,1V13a8.38,8.38,0,0,1,3.82-1,8.16,8.16,0,0,1,2.43.34Zm0-9.37a8.3,8.3,0,0,0-2.43-.34,6.5,6.5,0,0,0-3.82,1,6.45,6.45,0,0,0-3.81-1,6.5,6.5,0,0,0-3.82,1V21.72a.38.38,0,0,0,.35.35c.07,0,.1,0,.17,0a8.5,8.5,0,0,1,3.3-.76,6.45,6.45,0,0,1,3.81,1,8.38,8.38,0,0,1,3.82-1,7.12,7.12,0,0,1,3.3.73.34.34,0,0,0,.17,0,.38.38,0,0,0,.35-.34V11.56a5,5,0,0,0-1.39-.7"/></svg>
         </button>
         <button class="icon-btn" onclick="goHome()" aria-label="Exit to start">
-          <svg viewBox="0 0 22 22"><path d="M5 5l12 12M17 5L5 17"/></svg>
+          <svg viewBox="0 0 32.83 32.83" aria-hidden="true" focusable="false"><path class="ring" d="M16.41,32.33A15.92,15.92,0,1,0,.5,16.41,15.92,15.92,0,0,0,16.41,32.33"/><path class="xglyph" d="M22.02,10.8L10.81,22.02M10.81,10.8L22.02,22.02"/></svg>
         </button>
       </div>
     </div>
@@ -15312,7 +15314,7 @@ body{overflow-y:hidden;}
   <div class="bib-box">
     <div class="bib-head">
       <h2 id="bibTitle">Bibliography</h2>
-      <button class="bib-close" onclick="closeBib()" aria-label="Close bibliography">&times;</button>
+      <button class="bib-close icon-btn" onclick="closeBib()" aria-label="Close bibliography"><svg viewBox="0 0 32.83 32.83" aria-hidden="true" focusable="false"><path class="ring" d="M16.41,32.33A15.92,15.92,0,1,0,.5,16.41,15.92,15.92,0,0,0,16.41,32.33"/><path class="xglyph" d="M22.02,10.8L10.81,22.02M10.81,10.8L22.02,22.02"/></svg></button>
     </div>
     <div class="bib-body" id="bibBody" tabindex="0"></div>
   </div>
@@ -15723,6 +15725,7 @@ function setActive(activeId){
       var btn=document.getElementById('tl-'+tid+'-'+m.id);
       if(!btn) return;
       btn.classList.toggle('active', m.id===activeId);
+      if(m.id===activeId) btn.setAttribute('aria-current','step'); else btn.removeAttribute('aria-current');
       btn.classList.toggle('visited', !!(visited[m.id] && m.id!==activeId));
     });
     // Scroll ONLY the .tl-scroll container — never the page.
