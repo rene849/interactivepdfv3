@@ -36,13 +36,16 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;touch-acti
 html,body{overflow-x:hidden;;overflow-y:hidden;}
 .screen{display:none;}
 /* height:100vh + overflow:hidden creates the stacking context for sticky */
-.screen.is-active{display:flex;flex-direction:column;
-  /* IMPORTANT: never use vh/dvh here. Inside an iframe, 100vh == the iframe's
-     own height, and the parent resizes the iframe to match this page's height
-     (+ a buffer). height:100vh therefore creates an endless grow loop
-     (iframe grows -> 100vh grows -> body grows -> report -> iframe grows...).
-     A fixed px min-height keeps the timeline anchored without that loop. */
-  height:auto;min-height:620px;overflow:hidden;}
+.screen.is-active{
+  display:flex;flex-direction:column;overflow:hidden;
+  /* height:auto + min-height: screen sizes to its real content.
+     The cover art and intro S-curve use aspect-ratio so they scale
+     with container width — no vh feedback loop.
+     min-height ensures the timeline never floats too high on
+     narrow-but-tall viewports (e.g. tablet portrait).              */
+  height:auto;
+  min-height:min(620px, 90vw); /* 90vw = approx portrait tablet height */
+}
 
 /* ── APPBAR ── */
 .appbar{
@@ -58,9 +61,8 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
   display:flex;align-items:stretch;
   padding:0 clamp(18px,4vw,52px);
 }
-.appbar-logo{flex:none;display:flex;align-items:stretch;margin-left:-clamp(18px,4vw,52px);}
-.appbar-logo svg{height:100%;width:auto;display:block;}
-.appbar-divider{width:1px;background:var(--rule);margin:12px 0;flex:none;}
+.appbar-logo{display:none;}
+.appbar-divider{display:none;}
 .appbar-title{flex:1;display:flex;align-items:center;
   padding:0 16px;font-size:14px;font-weight:500;color:var(--ink);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -356,7 +358,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
   /* ── Appbar: logo on row 1, tool icons on a full-width row below ── */
   .appbar{height:auto;}
   .appbar-inner{padding:0 20px;flex-wrap:wrap;align-items:center;}
-  .appbar-logo{margin-left:-20px;flex:0 0 auto;}
+  .appbar-logo{display:none;}
   .appbar-divider{display:none;}
   .appbar-title{display:none;}              /* title moves into body as H1 */
   .appbar-tools{flex:1 1 100%;justify-content:space-between;padding:12px 0 14px;gap:0;}
@@ -15167,8 +15169,6 @@ body{overflow-y:hidden;}
   <!-- Appbar matching intro/event screens -->
   <div class="appbar" role="banner">
     <div class="appbar-inner">
-      <div class="appbar-logo" id="cvLogo" aria-label="Economist Education"></div>
-      <div class="appbar-divider" aria-hidden="true"></div>
       <span class="appbar-title">The lead-up to the US-China rivalry</span>
      
     </div>
@@ -15226,8 +15226,6 @@ body{overflow-y:hidden;}
   <!-- Sticky appbar -->
   <div class="appbar" role="banner">
     <div class="appbar-inner">
-      <div class="appbar-logo" id="intLogo" aria-label="Economist Education"></div>
-      <div class="appbar-divider" aria-hidden="true"></div>
       <span class="appbar-title">The lead-up to the US-China rivalry</span>
       <div class="appbar-tools">
         <button class="icon-btn" onclick="goIntro()" aria-label="Return to timeline">
@@ -15270,8 +15268,6 @@ body{overflow-y:hidden;}
 <div id="event" class="screen" aria-live="polite" aria-atomic="false">
   <div class="appbar" role="banner">
     <div class="appbar-inner">
-      <div class="appbar-logo" id="evLogo" aria-label="Economist Education"></div>
-      <div class="appbar-divider" aria-hidden="true"></div>
       <span class="appbar-title">The lead-up to the US-China rivalry</span>
       <div class="appbar-tools">
         <button class="icon-btn" onclick="goIntro()" aria-label="Return to timeline">
@@ -15863,11 +15859,6 @@ document.addEventListener('keydown',function(e){
   BIB.forEach(function(b){
     var p=document.createElement('p'); p.className='bib-entry';
     p.innerHTML=b; bibBody.appendChild(p);
-  });
-
-  // Inject logos into all appbars
-  ['cvLogo','intLogo','evLogo'].forEach(function(id){
-    injectId(id,'logo');
   });
 
   // Inject cover thumbnails.
