@@ -14,7 +14,7 @@
 :root{
   --red:#E3120B; --navy:#1F2E7A; --navy-deep:#141F52;
   --blue:#2E45B8; --teal:#36E2BD; --cream:#EBE9E0;
-  --ink:#0f172a; --muted:#5a5f73; --rule:#d7d9e0;
+  --ink:#0E0C0C; --muted:#5a5f73; --rule:#d7d9e0;
   --maxw:1320px;
   --pad:clamp(18px,4vw,52px);
   --screen-height:580px;
@@ -22,7 +22,7 @@
   color-scheme: only light;
 }
 /* Belt-and-braces: lock background/text even if UA dark styles slip through */
-html, body{background:#fff !important;color:#0f172a !important;}
+html, body{background:#fff !important;color:var(--ink) !important;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
 body{font-family:'Noto Sans',Arial,sans-serif;background:#fff;
@@ -45,7 +45,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
      min-height ensures the timeline never floats too high on
      narrow-but-tall viewports (e.g. tablet portrait).              */
   height:auto;
-  min-height:var(--screen-min,590px);
+  min-height:var(--screen-min,578px);
 }
 
 /* Narrower tablet / split-screen widths: event text wraps taller, so keep the
@@ -115,11 +115,11 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 }
 .cover-title{font-size:clamp(34px,4.2vw,56px);font-weight:800;
   line-height:1.08;letter-spacing:-.02em;color:var(--ink);
-  margin-bottom:clamp(16px,2.4vw,32px);}
+  margin-bottom:24px;}
 .btn-start{
   display:inline-flex;align-items:center;justify-content:center;
   background:var(--blue);color:#fff;font-weight:700;font-size:15px;
-  min-width:clamp(120px,14vw,152px);height:44px;padding:0 24px;
+  min-width:152px;height:44px;padding:0 24px;
   border-radius:4px;cursor:pointer;transition:background .18s;}
 .btn-start:hover,.btn-start:focus-visible{background:var(--navy);}
 
@@ -174,7 +174,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 }
 /* .tl-inner removed — HTML uses .tl-inner-wrap (see below) */
 /* Intro: extra top padding centres content between appbar and timeline */
-#intro .work-inner{padding-top:clamp(28px,5vw,64px);}
+#intro .work-inner{padding-top:clamp(28px,5vw,60px);}
 
 /* ── INTRO: S-curve panel ──
    Grid-stacked (like the cover) so intro-body's height is set by the art's
@@ -246,7 +246,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
   flex:none;
   width:100%;
   background:#fff;
-  padding:12px 0 14px;
+  padding:8px 0 8px;
   overflow:visible;
 }
 .tl-inner-wrap{
@@ -329,7 +329,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 }
 .bib-head h2{font-size:18px;font-weight:700;}
 .bib-close{flex:none;} /* circular icon styling comes from .icon-btn */
-.bib-body{padding:18px 24px;overflow-y:auto;font-size:clamp(13px,1.2vw,15px);line-height:1.72;color:var(--ink);font-weight:400;}
+.bib-body{padding:18px 24px;overflow-y:auto;font-size:15px;line-height:1.72;color:var(--ink);font-weight:400;}
 /* Hanging indent: first line flush left, wrapped lines indented; no rules between entries */
 .bib-entry{margin:0 0 14px;padding:0 0 0 24px;text-indent:-24px;border:0;}
 .bib-entry:last-child{margin-bottom:0;}
@@ -360,7 +360,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
    just scaled. Text stays inside the left ~44% so it never meets the curve. */
 @media(min-width:561px) and (max-width:799px){
   .cover-text{max-width:44%;}
-  .cover-title{font-size:clamp(26px,4.4vw,34px);margin-bottom:14px;}
+  .cover-title{font-size:clamp(26px,4.4vw,34px);margin-bottom:24px;}
   .intro-copy{max-width:44%;}
   .intro-copy p{margin-bottom:10px;}
 }
@@ -368,13 +368,13 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 /* Text-fit bands: body text and column proportions are chosen so every event
    stays inside the fixed screen height at that width (see screen min-height). */
 @media(min-width:800px) and (max-width:1149px){
-  .ev-desc,.intro-copy p{font-size:14px;line-height:1.6;}
+  .ev-desc,.intro-copy p{line-height:1.6;}
   .intro-copy{max-width:41%;}
-  .work-body{grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:24px;}
+  .work-body{grid-template-columns:minmax(0,1fr) clamp(170px,25%,250px);gap:28px;}
 }
 @media(min-width:561px) and (max-width:799px){
-  .ev-desc,.intro-copy p{font-size:13.5px;line-height:1.6;}
-  .work-body{grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:20px;}
+  .ev-desc,.intro-copy p{line-height:1.6;}
+  .work-body{grid-template-columns:minmax(0,1fr) clamp(130px,24%,190px);gap:20px;}
 }
 
 @media(max-width:560px){
@@ -443,7 +443,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
   .ev-year{font-size:26px;}
   .ev-title{font-size:18px;}
   .ev-rule{margin:10px 0 12px;}
-  .ev-desc{font-size:14px;line-height:1.7;}
+  .ev-desc{font-size:15px;line-height:1.7;}
 
   /* ── Accordion timeline ── */
   .acc{display:block;margin-top:6px;padding-bottom:28px;}
@@ -486,7 +486,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
   .acc-illo-inner svg,.acc-illo-inner img{width:100%;height:100%;object-fit:contain;display:block;}
   .acc-year-lg{font-size:26px;font-weight:800;color:var(--red);line-height:1;margin-bottom:6px;}
   .acc-title-lg{font-size:18px;font-weight:800;color:var(--ink);line-height:1.25;margin-bottom:12px;}
-  .acc-desc{font-size:14px;line-height:1.7;color:var(--ink);}
+  .acc-desc{font-size:15px;line-height:1.7;color:var(--ink);}
 }
 
 @media(max-width:400px){
@@ -15348,7 +15348,7 @@ body{overflow-y:hidden;}
             <h2 class="ev-title" id="evTitle"></h2>
           </div>
           <div class="ev-rule" aria-hidden="true"></div>
-          <div class="ev-desc" id="evDesc" tabindex="0"></div>
+          <div class="ev-desc" id="evDesc"></div>
         </div>
         <div class="ev-illo fade" id="evIllo" aria-hidden="true">
           <div class="ev-illo-inner" id="evIlloInner"></div>
@@ -15371,7 +15371,7 @@ body{overflow-y:hidden;}
       <h2 id="bibTitle">Bibliography</h2>
       <button class="bib-close icon-btn" onclick="closeBib()" aria-label="Close bibliography"><svg viewBox="0 0 32.83 32.83" aria-hidden="true" focusable="false"><path class="ring" d="M16.41,32.33A15.92,15.92,0,1,0,.5,16.41,15.92,15.92,0,0,0,16.41,32.33"/><path class="xglyph" d="M22.02,10.8L10.81,22.02M10.81,10.8L22.02,22.02"/></svg></button>
     </div>
-    <div class="bib-body" id="bibBody" tabindex="0"></div>
+    <div class="bib-body" id="bibBody" tabindex="0" role="region" aria-label="Bibliography entries"></div>
   </div>
 </div>
 
@@ -15763,9 +15763,11 @@ function buildAccordion(){
     var meta=document.createElement('span'); meta.className='acc-meta';
     var yr=document.createElement('span'); yr.className='acc-year'; yr.textContent=m.year;
     var tl=document.createElement('span'); tl.className='acc-title'; tl.textContent=m.title;
-    meta.appendChild(yr); meta.appendChild(tl);
+    var sep2=document.createElement('span'); sep2.className='sr-only'; sep2.textContent=': ';
+    meta.appendChild(yr); meta.appendChild(sep2); meta.appendChild(tl);
 
-    row.appendChild(numWrap); row.appendChild(meta);
+    var sep1=document.createElement('span'); sep1.className='sr-only'; sep1.textContent=', ';
+    row.appendChild(numWrap); row.appendChild(sep1); row.appendChild(meta);
     row.addEventListener('click',function(){ toggleAcc(m.id); });
 
     /* expanded panel */
@@ -15806,17 +15808,17 @@ function fitScreens(){
   var root=document.documentElement;
   var w=window.innerWidth;
   if(w<=560){ root.style.setProperty('--screen-min','620px'); return; } /* phone: cover fills 620px; intro scrolls */
-  var base = w<800 ? 620 : 590;
+  var base = w<800 ? 620 : 578;
   var els=['cover','intro','event'].map(function(id){return document.getElementById(id);});
   var was=els.map(function(el){return el.classList.contains('is-active');});
   /* measure with the same classes a real screen has (inactive screens lay out differently) */
   els.forEach(function(el){ el.classList.add('is-active'); el.style.minHeight='0'; });
-  var max=Math.max(base, els[0].offsetHeight, els[1].offsetHeight);
+  var max=Math.max(base, Math.ceil(els[0].getBoundingClientRect().height), Math.ceil(els[1].getBoundingClientRect().height));
   var ev=els[2], yr=document.getElementById('evYear'), ti=document.getElementById('evTitle'), de=document.getElementById('evDesc');
   var oy=yr.textContent, ot=ti.textContent, od=de.textContent;
   MS.forEach(function(m){
     yr.textContent=m.year; ti.textContent=m.title; de.textContent=m.desc;
-    max=Math.max(max, ev.offsetHeight);
+    max=Math.max(max, Math.ceil(ev.getBoundingClientRect().height));
   });
   yr.textContent=oy; ti.textContent=ot; de.textContent=od;
   els.forEach(function(el,i){ if(!was[i]) el.classList.remove('is-active'); el.style.minHeight=''; });
