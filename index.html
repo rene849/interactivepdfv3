@@ -523,20 +523,35 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
   }
 }
 
-/* Cover below 1100px (narrow frames, or with Moodle side menus open): one
-   column held to 520px, title at the top, graphic in the middle, Start at the
-   bottom, with the spare height shared between them. */
-@media(max-width:1099px){
-  #cover{min-height:var(--screen-min,620px);}
-  #cover .cover-stage{display:flex;flex-direction:column;justify-content:space-between;align-items:stretch;
-    flex:1;width:100%;max-width:520px;margin:0 auto;padding:clamp(20px,4.5vh,40px) clamp(18px,4vw,28px);}
-  #cover .cover-text{display:flex;flex-direction:column;justify-content:space-between;flex:1;max-width:none;align-self:stretch;}
-  #cover .cover-title{order:1;flex:none;font-size:clamp(28px,6.2vw,40px);line-height:1.08;margin:0;}
+/* ── Narrow and medium frames (side menus open) ───────────────────────────
+   561–1099px: the desktop arrangement, scaled — copy on the left, artwork on
+   the right, centred vertically so the frame is filled. */
+@media(min-width:561px) and (max-width:1099px){
+  #cover{min-height:var(--screen-min,590px);}
+  #cover .cover-stage{display:grid;grid-template-columns:minmax(0,42%) minmax(0,58%);
+    grid-template-rows:1fr 1fr;align-items:stretch;column-gap:clamp(24px,4vw,56px);
+    flex:1;width:100%;max-width:var(--maxw);margin:0 auto;padding:clamp(20px,4vh,36px) clamp(18px,4vw,52px);}
+  #cover .cover-text{display:contents;}
+  #cover .cover-title{grid-column:1;grid-row:1;align-self:start;font-size:clamp(30px,3.6vw,44px);line-height:1.08;margin:0;}
   #cover .cover-art{display:none;}
-  #cover .cover-art-mobile{display:block;order:2;flex:none;width:100%;aspect-ratio:300/232;margin:auto 0;position:relative;}
-  #cover .cover-art-mobile .thumb{width:clamp(40px,18%,62px);height:clamp(40px,18%,62px);}
-  #cover .btn-start{order:3;flex:none;width:100%;margin-top:0;}
+  #cover .cover-art-mobile{display:block;grid-column:2;grid-row:1 / span 2;align-self:center;position:relative;width:100%;aspect-ratio:300/232;margin:0;}
+  #cover .btn-start{grid-column:1;grid-row:2;align-self:end;width:auto;min-width:152px;height:44px;}
   #cover .cover-text::after{display:none;}
+  .intro-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;column-gap:clamp(24px,4vw,56px);}
+  .intro-copy{grid-column:1;grid-row:1;max-width:none;margin:0;}
+  .intro-bg{grid-column:2;grid-row:1;width:100%;max-width:400px;justify-self:end;aspect-ratio:1200/1100;height:auto;margin:0;}
+  .work-body{align-items:start;}
+  .ev-illo{align-self:start;}
+}
+/* Phone frames: full width. The graphic spans the frame, title sits at the top
+   and the Start button at the bottom. */
+@media(max-width:560px){
+  #cover{min-height:var(--screen-min,620px);}
+  #cover .cover-stage{display:flex;flex-direction:column;justify-content:space-between;flex:1;width:100%;max-width:none;padding:clamp(20px,4vh,36px) 18px;}
+  #cover .cover-text{display:flex;flex-direction:column;justify-content:space-between;flex:1;max-width:none;align-self:stretch;}
+  #cover .cover-title{margin:0;}
+  #cover .cover-art-mobile{display:block;width:100%;aspect-ratio:300/232;margin:auto 0;position:relative;}
+  #cover .btn-start{width:100%;margin-top:0;}
 }
 </style>
 </head>
@@ -15586,6 +15601,10 @@ var DOTS=[
   {t:.690,r:8},{t:.780,r:7},{t:.850,r:6},{t:.900,r:8},
   {t:.955,r:12},{t:.985,r:5,faint:true}
 ];
+/* Medium/narrow frames: same three-run curve, drawn taller (1200 x 1000) so the
+   box can fill the right-hand column without distorting the arcs or dots. */
+var INTRO_D_TALL = "M 0 90 H 940 a60 220 0 0 1 0 440 H 600 a60 220 0 0 0 0 440 H 1199";
+function introIsMid(){ var w=window.innerWidth; return w>=561 && w<=1099; }
 var introDrawn = false;
 
 function drawIntro(){
@@ -15597,7 +15616,9 @@ function drawIntro(){
   svg.innerHTML='';
 
   var path = document.createElementNS(NS,'path');
-  path.setAttribute('d',INTRO_D);
+  var mid = introIsMid();
+  svg.setAttribute('viewBox', mid ? '0 0 1200 1100' : '0 0 1200 300');
+  path.setAttribute('d', mid ? INTRO_D_TALL : INTRO_D);
   path.setAttribute('class','road');
   svg.appendChild(path);
   var L = path.getTotalLength();
