@@ -54,6 +54,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 
 /* ── APPBAR ── */
 .appbar{
+  box-shadow:0 2px 6px rgba(13,13,13,0.12);
   position:relative;z-index:40;flex:none;
   background:#fff;border-bottom:1px solid var(--rule);
   height:60px;
@@ -119,11 +120,11 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
    stage's height, at exactly the size its own width/aspect-ratio needs. */
 .cover-art{
   grid-area:1/1;align-self:center;justify-self:stretch;
-  width:100%;aspect-ratio:1340/530;
+  width:100%;aspect-ratio:1272/420;
   pointer-events:none;z-index:1;
 ;}
 .cover-art-inner{
-  position:relative;width:100%;aspect-ratio:1340/530;
+  position:relative;width:100%;aspect-ratio:1272/420;
 }
 /* Mobile cover art (stacked layout) — hidden on desktop */
 .cover-art-mobile{display:none;}
@@ -189,8 +190,8 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 .intro-copy p:last-child{margin-bottom:0;}
 .intro-bg{
   grid-area:1/1;align-self:center;justify-self:stretch;
-  position:relative;width:100%;aspect-ratio:1200/300;
-  max-height:100%;z-index:0;pointer-events:none;overflow:hidden;
+  position:relative;width:100%;aspect-ratio:1272/380;
+  max-height:100%;z-index:0;pointer-events:none;overflow:visible;
 }
 .intro-bg svg{width:100%;height:100%;display:block;overflow:visible;}
 .intro-path .road{fill:none;stroke:var(--blue);stroke-width:1.8;
@@ -539,7 +540,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
   #cover .cover-text::after{display:none;}
   .intro-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;column-gap:clamp(24px,4vw,56px);}
   .intro-copy{grid-column:1;grid-row:1;max-width:none;margin:0;}
-  .intro-bg{grid-column:2;grid-row:1;width:100%;max-width:400px;justify-self:end;aspect-ratio:1200/1100;height:auto;margin:0;}
+  .intro-bg{grid-column:2;grid-row:1;width:100%;max-width:400px;justify-self:end;aspect-ratio:1272/1100;height:auto;margin:0;}
   .work-body{align-items:start;}
   .ev-illo{align-self:start;}
 }
@@ -561,21 +562,9 @@ body{margin:8px !important;border-radius:8px;box-shadow:0px 4px 8px 0px rgba(13,
 @media(max-width:560px){ html{overflow-y:scroll;} }
 
 /* ── One-menu desktop widths (1100–1399px): scale the medium arrangement ── */
-@media(min-width:1100px) and (max-width:1399px){
-  #cover .cover-stage{display:grid;grid-template-columns:minmax(0,42%) minmax(0,58%);
-    grid-template-rows:1fr 1fr;align-items:stretch;column-gap:clamp(24px,3vw,48px);
-    flex:1;width:100%;max-width:var(--maxw);margin:0 auto;padding:clamp(20px,4vh,36px) clamp(18px,3vw,40px);}
-  #cover .cover-text{display:contents;}
-  #cover .cover-title{grid-column:1;grid-row:1;align-self:end;font-size:clamp(34px,3.6vw,50px);line-height:1.08;margin:0 0 clamp(18px,2.6vw,30px);}
-  #cover .cover-art{display:none;}
-  #cover .cover-art-mobile{display:block;grid-column:2;grid-row:1 / span 2;align-self:center;justify-self:center;position:relative;width:100%;max-width:460px;aspect-ratio:300/232;margin:0;}
-  #cover .btn-start{grid-column:1;grid-row:2;align-self:start;justify-self:start;width:auto;min-width:152px;height:44px;}
-  #cover .cover-art-mobile .thumb{width:clamp(48px,22%,76px);height:clamp(48px,22%,76px);opacity:1;transform:translate(-50%,-50%) scale(1);}
-  #cover .cover-text::after{display:none;}
-  .intro-body{display:grid;grid-template-columns:minmax(0,40%) minmax(0,60%);align-items:center;column-gap:clamp(24px,3vw,48px);}
-  .intro-copy{grid-column:1;grid-row:1;max-width:none;margin:0;}
-  .intro-bg{grid-column:2;grid-row:1;width:100%;max-width:none;justify-self:end;aspect-ratio:1200/600;height:auto;margin:0;}
-}
+#cover .appbar-title{display:none;}
+/* Phones: each open event sits at its own height (no empty space under short ones). */
+@media(max-width:560px){ .acc-panel{height:auto !important;padding-bottom:12px;} }
 </style>
 </head>
 <body>
@@ -15280,24 +15269,27 @@ body{overflow-y:hidden;}
     <!-- S-curve art: contained to the stage, weave kept to the right -->
     <div class="cover-art" aria-hidden="true">
       <div class="cover-art-inner" id="coverArtWrap">
-        <svg id="coverSvg" class="cover-path" viewBox="0 100 1340 530" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+        <svg id="coverSvg" class="cover-path" viewBox="0 0 1272 420" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
           <path class="road" id="coverRoad"
-            d="M 0 150 H 980 a46 46 0 0 1 0 92 H 720 a48 48 0 0 0 0 96 H 1180 a52 52 0 0 1 0 104 H 740 a56 56 0 0 0 0 112 H 1320"/>
-          <path class="arrowhead" id="coverArrow" d="M 1308,546 L 1320,554 L 1308,562" style="opacity:0;"/>
-          <circle class="node" cx="980"  cy="150" r="9" style="opacity:0;"/>
-          <circle class="node" cx="720"  cy="242" r="7" style="opacity:0;"/>
-          <circle class="node" cx="1180" cy="338" r="9" style="opacity:0;"/>
-          <circle class="node" cx="740"  cy="442" r="7" style="opacity:0;"/>
-          <circle class="node" cx="1000" cy="554" r="8" style="opacity:0;"/>
+            d="M 0 0.00 H 1035 A 23 26.61 0 0 1 1035 53.22 H 770 A 35 40.50 0 0 0 770 134.21 H 1093 A 52 60.17 0 0 1 1093 254.55 H 664 A 71.5 82.73 0 0 0 664 420.00 H 1272"/>
+          <path class="arrowhead" id="coverArrow" d="M 1260,410 L 1272,420 L 1260,430" style="opacity:0;"/>
+          <circle class="node" cx="880" cy="2.3" r="4" style="opacity:0;"/>
+          <circle class="node" cx="994" cy="53.2" r="14" style="opacity:0;"/>
+          <circle class="node" cx="737" cy="93.7" r="9" style="opacity:0;"/>
+          <circle class="node" cx="797" cy="134.2" r="6" style="opacity:0;"/>
+          <circle class="node" cx="1145" cy="193.2" r="9" style="opacity:0;"/>
+          <circle class="node" cx="1133" cy="236.0" r="4" style="opacity:0;"/>
+          <circle class="node" cx="827" cy="420.0" r="8" style="opacity:0;"/>
+          <circle class="node" cx="972" cy="420.0" r="13" style="opacity:0;"/>
         </svg>
         <!-- Thumbnails on the weave (% of the 1340x700 box).
              NOTE: source asset labels are mismatched, so each thumb is pointed
              at the asset that actually renders the intended icon (see thumbMap). -->
-        <div id="th-china"  class="thumb" style="left:61.9%;top:26.8%;"></div>
-        <div id="th-helmet" class="thumb" style="left:78.4%;top:44.9%;"></div>
-        <div id="th-plane"  class="thumb" style="left:64.9%;top:64.5%;"></div>
-        <div id="th-ussr"   class="thumb" style="left:59.7%;top:85.7%;"></div>
-        <div id="th-globe"  class="thumb" style="left:85.8%;top:85.7%;"></div>
+        <div id="th-china"  class="thumb" style="left:68.9%;top:31.7%;"></div>
+        <div id="th-helmet" class="thumb" style="left:81.5%;top:61.4%;"></div>
+        <div id="th-plane"  class="thumb" style="left:62.3%;top:61.4%;"></div>
+        <div id="th-ussr"   class="thumb" style="left:55.2%;top:100.0%;"></div>
+        <div id="th-globe"  class="thumb" style="left:89.0%;top:100.0%;"></div>
       </div>
     </div>
   </div>
@@ -15629,6 +15621,16 @@ var DOTS=[
 var INTRO_D_TALL = "M 0 90 H 940 a60 220 0 0 1 0 440 H 600 a60 220 0 0 0 0 440 H 1199";
 function introIsMid(){ var w=window.innerWidth; return w>=561 && w<=1099; }
 function introIsWide(){ var w=window.innerWidth; return w>=1100 && w<=1399; }
+/* The S-curve shared by the cover and the instruction slide: five runs and four
+   turns, placed by fraction of the box height so any height keeps the same
+   shape. Each turn's vertical radius is half its run spacing (no distortion). */
+function sCurvePath(H){
+  var f=[0,46/363,116/363,220/363,1], y=f.map(function(v){return +(v*H).toFixed(2);});
+  return "M 0 "+y[0]+" H 1035 A 23 "+((y[1]-y[0])/2)+" 0 0 1 1035 "+y[1]+
+         " H 770 A 35 "+((y[2]-y[1])/2)+" 0 0 0 770 "+y[2]+
+         " H 1093 A 52 "+((y[3]-y[2])/2)+" 0 0 1 1093 "+y[3]+
+         " H 664 A 71.5 "+((y[4]-y[3])/2)+" 0 0 0 664 "+y[4]+" H 1272";
+}
 /* Same three-run curve at any height H (viewBox 1200 x H), so the box keeps its
    proportions and the arcs and dots are not distorted. */
 function introPath(H){
@@ -15646,9 +15648,10 @@ function drawIntro(){
   svg.innerHTML='';
 
   var path = document.createElementNS(NS,'path');
-  var H = introIsMid() ? 1100 : (introIsWide() ? 600 : 300);
-  svg.setAttribute('viewBox', '0 0 1200 '+H);
-  path.setAttribute('d', H===300 ? INTRO_D : introPath(H));
+  var H = introIsMid() ? 1100 : 380;
+  /* small margin so strokes and the arrowhead are not clipped at the box edge */
+  svg.setAttribute('viewBox', '-6 -6 1284 '+(H+12));
+  path.setAttribute('d', sCurvePath(H));
   path.setAttribute('class','road');
   svg.appendChild(path);
   var L = path.getTotalLength();
