@@ -44,13 +44,12 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
      min-height ensures the timeline never floats too high on
      narrow-but-tall viewports (e.g. tablet portrait).              */
   height:auto;
-  min-height:min(590px, 90vw); /* 90vw = approx portrait tablet height */
+  min-height:var(--screen-min,590px);
 }
 
 /* Narrower tablet / split-screen widths: event text wraps taller, so keep the
    original 620px minimum here to avoid a height change between events. */
 @media (max-width:799px){
-  .screen.is-active{min-height:min(620px, 90vw);}
 }
 
 /* ── APPBAR ── */
@@ -138,7 +137,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 /* Cover floating thumbnails */
 .thumb{
   position:absolute;
-  width:clamp(54px,9%,76px);height:clamp(54px,9%,76px);
+  width:clamp(64px,10.5%,96px);height:clamp(64px,10.5%,96px);
   transform:translate(-50%,-50%) scale(.6);opacity:0;
   transition:opacity .4s ease,transform .4s cubic-bezier(.16,1,.3,1);
   pointer-events:none;z-index:10;
@@ -360,7 +359,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
   .cover-title{order:1;font-size:clamp(30px,4vw,44px);margin-bottom:8px;}
   .cover-art-mobile{display:block;width:100%;max-width:380px;margin:6px auto 16px;order:2;position:relative;}
   .cover-art-mobile .cover-path{width:100%;height:auto;display:block;overflow:visible;}
-  .cover-art-mobile .thumb{width:clamp(34px,15%,50px);height:clamp(34px,15%,50px);opacity:1;transform:translate(-50%,-50%) scale(1);}
+  .cover-art-mobile .thumb{width:clamp(40px,18%,62px);height:clamp(40px,18%,62px);opacity:1;transform:translate(-50%,-50%) scale(1);}
   .btn-start{order:3;width:auto;min-width:152px;align-self:flex-start;height:44px;}
   .cover-text::after{content:'';display:block;height:1px;background:var(--rule);margin-top:22px;order:4;}
 }
@@ -524,6 +523,21 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
   }
 }
 
+/* Cover below 1100px (narrow frames, or with Moodle side menus open): one
+   column held to 520px, title at the top, graphic in the middle, Start at the
+   bottom, with the spare height shared between them. */
+@media(max-width:1099px){
+  #cover{min-height:var(--screen-min,620px);}
+  #cover .cover-stage{display:flex;flex-direction:column;justify-content:space-between;align-items:stretch;
+    flex:1;width:100%;max-width:520px;margin:0 auto;padding:clamp(20px,4.5vh,40px) clamp(18px,4vw,28px);}
+  #cover .cover-text{display:flex;flex-direction:column;justify-content:space-between;flex:1;max-width:none;align-self:stretch;}
+  #cover .cover-title{order:1;flex:none;font-size:clamp(28px,6.2vw,40px);line-height:1.08;margin:0;}
+  #cover .cover-art{display:none;}
+  #cover .cover-art-mobile{display:block;order:2;flex:none;width:100%;aspect-ratio:300/232;margin:auto 0;position:relative;}
+  #cover .cover-art-mobile .thumb{width:clamp(40px,18%,62px);height:clamp(40px,18%,62px);}
+  #cover .btn-start{order:3;flex:none;width:100%;margin-top:0;}
+  #cover .cover-text::after{display:none;}
+}
 </style>
 </head>
 <body>
@@ -15737,6 +15751,31 @@ function sizeAccordion(){
   panels.forEach(function(p){ p.style.display=''; });
   if(max>0) acc.style.setProperty('--acc-h', max+'px');
 }
+/* Every screen gets the height of the tallest one at this width, so the
+   frame never changes height between cover, intro and events. Event text is
+   measured in place (text swapped and restored synchronously; nothing paints). */
+function fitScreens(){
+  var root=document.documentElement;
+  var w=window.innerWidth;
+  if(w<=560){ root.style.setProperty('--screen-min','620px'); return; } /* phone: cover fills 620px; intro scrolls */
+  var base = w<800 ? 620 : 590;
+  var els=['cover','intro','event'].map(function(id){return document.getElementById(id);});
+  var was=els.map(function(el){return el.classList.contains('is-active');});
+  /* measure with the same classes a real screen has (inactive screens lay out differently) */
+  els.forEach(function(el){ el.classList.add('is-active'); el.style.minHeight='0'; });
+  var max=Math.max(base, els[0].offsetHeight, els[1].offsetHeight);
+  var ev=els[2], yr=document.getElementById('evYear'), ti=document.getElementById('evTitle'), de=document.getElementById('evDesc');
+  var oy=yr.textContent, ot=ti.textContent, od=de.textContent;
+  MS.forEach(function(m){
+    yr.textContent=m.year; ti.textContent=m.title; de.textContent=m.desc;
+    max=Math.max(max, ev.offsetHeight);
+  });
+  yr.textContent=oy; ti.textContent=ot; de.textContent=od;
+  els.forEach(function(el,i){ if(!was[i]) el.classList.remove('is-active'); el.style.minHeight=''; });
+  root.style.setProperty('--screen-min', Math.ceil(max)+'px');
+}
+var _fitTimer=null;
+window.addEventListener('resize', function(){ clearTimeout(_fitTimer); _fitTimer=setTimeout(fitScreens,120); });
 function toggleAcc(id){
   var items=document.querySelectorAll('#mobileTimeline .acc-item');
   items.forEach(function(it){
@@ -15935,6 +15974,8 @@ document.addEventListener('keydown',function(e){
   // Build the mobile accordion
   buildAccordion();
   sizeAccordion();
+  fitScreens();
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(fitScreens);
   window.addEventListener('resize', sizeAccordion);
 
   // Start cover animation
