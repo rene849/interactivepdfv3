@@ -16,6 +16,7 @@
   --blue:#2E45B8; --teal:#36E2BD; --cream:#EBE9E0;
   --ink:#0f172a; --muted:#5a5f73; --rule:#d7d9e0;
   --maxw:1320px;
+  --pad:clamp(18px,4vw,52px);
   --screen-height:580px;
   /* Force light rendering — illustrations designed for white background */
   color-scheme: only light;
@@ -54,9 +55,8 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 
 /* ── APPBAR ── */
 .appbar{
-  box-shadow:0 2px 6px rgba(13,13,13,0.12);
   position:relative;z-index:40;flex:none;
-  background:#fff;border-bottom:1px solid var(--rule);
+  background:#fff;
   height:60px;
   display:flex;align-items:stretch;
 }
@@ -65,7 +65,13 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 .appbar-inner{
   width:100%;max-width:var(--maxw);margin:0 auto;
   display:flex;align-items:stretch;
-  padding:0 clamp(18px,4vw,52px);
+  padding:0 var(--pad);position:relative;
+}
+/* Divider under the top nav: a flat 1px line inset to the content edges,
+   no drop shadow, not touching either side of the frame. */
+.appbar-inner::after{
+  content:'';position:absolute;left:var(--pad);right:var(--pad);bottom:0;
+  height:1px;background:var(--rule);
 }
 .appbar-logo{display:none;}
 .appbar-divider{display:none;}
@@ -99,8 +105,10 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
     from its own width via aspect-ratio — no guessed buffer needed at any
     container width, unlike a fixed aspect-ratio on the stage itself. */
   padding:clamp(12px,2vw,24px) clamp(18px,4vw,52px);
-  overflow:hidden;
+  /* centred in the frame; overflow stays visible so the lowest icons are not clipped */
+  flex:1 0 auto;align-content:center;overflow:visible;
 }
+#cover .appbar{display:none;}
 .cover-text{
   grid-area:1/1;align-self:center;justify-self:start;
   position:relative;z-index:5;max-width:clamp(300px,42%,560px);
@@ -138,7 +146,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 /* Cover floating thumbnails */
 .thumb{
   position:absolute;
-  width:clamp(76px,12.5%,116px);height:clamp(76px,12.5%,116px);
+  width:clamp(38px,7%,84px);aspect-ratio:1/1;height:auto;
   transform:translate(-50%,-50%) scale(.6);opacity:0;
   transition:opacity .4s ease,transform .4s cubic-bezier(.16,1,.3,1);
   pointer-events:none;z-index:10;
@@ -190,7 +198,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 .intro-copy p:last-child{margin-bottom:0;}
 .intro-bg{
   grid-area:1/1;align-self:center;justify-self:stretch;
-  position:relative;width:100%;aspect-ratio:1272/380;
+  position:relative;width:100%;aspect-ratio:1284/392;
   max-height:100%;z-index:0;pointer-events:none;overflow:visible;
 }
 .intro-bg svg{width:100%;height:100%;display:block;overflow:visible;}
@@ -346,29 +354,27 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
   .tl-conn{margin-top:16px;}
 }
 
-/* 561–1099px: stacked layouts (text above the curve, cover art between title
-   and button) so nothing overlaps and the screen fills its fixed height. */
-@media(min-width:561px) and (max-width:1099px){
+/* 561–799px (very narrow frame): title, then the SAME S-curve, then the button.
+   The curve is the desktop artwork scaled to the width, never a different drawing. */
+@media(min-width:561px) and (max-width:799px){
+  #cover .cover-stage{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;
+    gap:clamp(14px,3vw,22px);padding:24px clamp(18px,4vw,52px) 44px;}
+  #cover .cover-text{display:contents;}
+  #cover .cover-text::after{display:none;}
+  #cover .cover-title{order:1;font-size:clamp(30px,4.6vw,38px);margin:0;}
+  #cover .cover-art-mobile{display:none;}
+  #cover .cover-art{order:2;display:block;}
+  #cover .btn-start{order:3;width:auto;min-width:152px;}
   .intro-body{display:flex;flex-direction:column;justify-content:center;}
-  .intro-copy{max-width:none;order:1;}
-  .intro-bg{order:2;width:100%;margin-top:18px;}
-
-  .cover-stage{display:flex;flex-direction:column;justify-content:center;align-items:stretch;
-    flex:1;padding:20px clamp(18px,4vw,52px);}
-  .cover-art{display:none;}
-  .cover-text{max-width:none;display:flex;flex-direction:column;align-self:stretch;}
-  .cover-title{order:1;font-size:clamp(30px,4vw,44px);margin-bottom:8px;}
-  .cover-art-mobile{display:block;width:100%;max-width:380px;margin:6px auto 16px;order:2;position:relative;}
-  .cover-art-mobile .cover-path{width:100%;height:auto;display:block;overflow:visible;}
-  .cover-art-mobile .thumb{width:clamp(48px,22%,76px);height:clamp(48px,22%,76px);opacity:1;transform:translate(-50%,-50%) scale(1);}
-  .btn-start{order:3;width:auto;min-width:152px;align-self:flex-start;height:44px;}
-  .cover-text::after{content:'';display:block;height:1px;background:var(--rule);margin-top:22px;order:4;}
+  .intro-copy{max-width:none;order:1;align-self:stretch;}
+  .intro-bg{order:2;width:100%;margin-top:18px;align-self:stretch;}
 }
 
 /* Text-fit bands: body text and column proportions are chosen so every event
    stays inside the fixed screen height at that width (see screen min-height). */
 @media(min-width:800px) and (max-width:1149px){
   .ev-desc,.intro-copy p{font-size:14px;line-height:1.6;}
+  .intro-copy{max-width:41%;}
   .work-body{grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:24px;}
 }
 @media(min-width:561px) and (max-width:799px){
@@ -387,7 +393,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 
   /* ── Appbar: logo on row 1, tool icons on a full-width row below ── */
   .appbar{height:auto;}
-  .appbar-inner{padding:0 20px;flex-wrap:wrap;align-items:center;}
+  .appbar-inner{--pad:20px;padding:0 20px;flex-wrap:wrap;align-items:center;}
   .appbar-logo{display:none;}
   .appbar-divider{display:none;}
   .appbar-title{display:none;}              /* title moves into body as H1 */
@@ -524,23 +530,10 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
   }
 }
 
-/* ── Narrow and medium frames (side menus open) ───────────────────────────
-   561–1099px: the desktop arrangement, scaled — copy on the left, artwork on
-   the right, centred vertically so the frame is filled. */
+/* ── Narrow and medium frames (side menus open) ──
+   Cover and instruction slides use the desktop arrangement, scaled. Only the
+   event screen needs its own alignment tweak here. */
 @media(min-width:561px) and (max-width:1099px){
-  #cover{min-height:var(--screen-min,590px);}
-  #cover .cover-stage{display:grid;grid-template-columns:minmax(0,42%) minmax(0,58%);
-    grid-template-rows:1fr 1fr;align-items:stretch;column-gap:clamp(24px,4vw,56px);
-    flex:1;width:100%;max-width:var(--maxw);margin:0 auto;padding:clamp(20px,4vh,36px) clamp(18px,4vw,52px);}
-  #cover .cover-text{display:contents;}
-  #cover .cover-title{grid-column:1;grid-row:1;align-self:end;font-size:clamp(30px,3.6vw,44px);line-height:1.08;margin:0 0 clamp(18px,2.6vw,30px);}
-  #cover .cover-art{display:none;}
-  #cover .cover-art-mobile{display:block;grid-column:2;grid-row:1 / span 2;align-self:center;position:relative;width:100%;aspect-ratio:300/232;margin:0;}
-  #cover .btn-start{grid-column:1;grid-row:2;align-self:start;width:auto;min-width:152px;height:44px;}
-  #cover .cover-text::after{display:none;}
-  .intro-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;column-gap:clamp(24px,4vw,56px);}
-  .intro-copy{grid-column:1;grid-row:1;max-width:none;margin:0;}
-  .intro-bg{grid-column:2;grid-row:1;width:100%;max-width:400px;justify-self:end;aspect-ratio:1272/1100;height:auto;margin:0;}
   .work-body{align-items:start;}
   .ev-illo{align-self:start;}
 }
@@ -15237,13 +15230,6 @@ body{overflow-y:hidden;}
 
 <!-- ══════════ COVER ══════════ -->
 <div id="cover" class="screen is-active" aria-labelledby="covTitle">
-  <!-- Appbar matching intro/event screens -->
-  <div class="appbar" role="banner">
-    <div class="appbar-inner">
-      <span class="appbar-title">The lead-up to the US-China rivalry</span>
-     
-    </div>
-  </div>
   <div class="cover-stage">
     <div class="cover-text">
       <h1 id="covTitle" class="cover-title">The lead-up to the<br>US-China rivalry</h1>
@@ -15319,11 +15305,11 @@ body{overflow-y:hidden;}
       <h1 class="screen-title">The lead-up to the US-China rivalry</h1>
       <div class="intro-body">
         <div class="intro-bg" aria-hidden="true">
-          <svg id="introSvg" class="intro-path" viewBox="0 0 1200 300" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"></svg>
+          <svg id="introSvg" class="intro-path" viewBox="-6 -6 1284 392" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
         <div class="intro-copy">
           <p id="introDesc">In the preceding decades, various events occurred that culminated in the US-China rivalry.</p>
-          <p>To understand how the rivalry reached its current state, <strong>click on each event</strong> in the timeline below.</p>
+          <p>To understand how the rivalry reached its current state, <strong>select each event</strong> in the timeline below.</p>
         </div>
       </div>
       <!-- Mobile-only accordion timeline (built by JS) -->
@@ -15554,6 +15540,7 @@ function show(id){
     document.getElementById(s).classList.toggle('is-active', s===id);
   });
   sizeAccordion(); /* panels can only be measured once the intro is visible */
+  scaleStrokes();
   // Reset the scroller for whichever screen is now active (desktop, where
   // .work-outer is the internal scroll container)
   var outer = document.getElementById(id==='intro'?'introOuter':id==='event'?'eventOuter':null);
@@ -15568,6 +15555,7 @@ function show(id){
 
 /* ── Cover animation ─────────────────────────────────────────── */
 function animateCover(){
+  scaleStrokes();
   var road   = document.getElementById('coverRoad');
   var arrow  = document.getElementById('coverArrow');
   var nodes  = document.getElementById('coverSvg').querySelectorAll('.node');
@@ -15648,7 +15636,7 @@ function drawIntro(){
   svg.innerHTML='';
 
   var path = document.createElementNS(NS,'path');
-  var H = introIsMid() ? 1100 : 380;
+  var H = 380;
   /* small margin so strokes and the arrowhead are not clipped at the box edge */
   svg.setAttribute('viewBox', '-6 -6 1284 '+(H+12));
   path.setAttribute('d', sCurvePath(H));
@@ -15703,7 +15691,19 @@ function drawIntro(){
     }
     svg.appendChild(circ);
   });
+  scaleStrokes();
 }
+/* Keep the S-curve line at the same on-screen weight (~2px) at every frame
+   width, instead of thinning or thickening as the artwork scales. */
+function scaleStrokes(){
+  [['coverSvg',1272],['introSvg',1284]].forEach(function(p){
+    var svg=document.getElementById(p[0]); if(!svg) return;
+    var w=svg.getBoundingClientRect().width; if(!w) return;
+    var sw=(2/(w/p[1])).toFixed(2);
+    svg.querySelectorAll('.road,.arrowhead').forEach(function(el){ el.style.strokeWidth=sw; });
+  });
+}
+window.addEventListener('resize',function(){ requestAnimationFrame(scaleStrokes); });
 
 /* ── Timeline strip builder ──────────────────────────────────── */
 function buildTrack(id){
