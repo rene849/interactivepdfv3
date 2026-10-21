@@ -555,6 +555,13 @@ body{margin:8px !important;border-radius:8px;box-shadow:0 0 6px 0 rgba(13,13,13,
 #cover .appbar-title{display:none;}
 /* Phones: each open event sits at its own height (no empty space under short ones). */
 @media(max-width:560px){ .acc-panel{height:auto !important;padding-bottom:12px;} }
+.ev-illo{align-self:start;}
+@media(min-width:1150px){.work-body{grid-template-columns:minmax(0,1fr) clamp(240px,24%,340px);gap:clamp(28px,3.5vw,44px);}.ev-illo-inner{max-width:340px;}}
+@media(min-width:800px){
+ #eventOuter .work-inner{padding-top:12px;padding-bottom:12px;}
+ #eventOuter .work-body{padding-top:12px;padding-bottom:10px;}
+ .ev-rule{margin:12px 0 12px;}
+}
 </style>
 </head>
 <body>
