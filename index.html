@@ -213,7 +213,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 .work-body{
   flex:1 0 auto; /* fill the space above the timeline so .ev-illo can centre in it */
   display:grid;
-  grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);
+  grid-template-columns:minmax(0,1fr) clamp(200px,20%,280px);
   gap:clamp(20px,4vw,56px);
   align-items:start;     /* pin both columns to the same top edge, so text
     position doesn't drift between events with different description
@@ -228,7 +228,9 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 .ev-title{font-size:clamp(16px,1.8vw,22px);font-weight:800;
   letter-spacing:-.015em;line-height:1.22;color:var(--ink);}
 .ev-rule{height:1px;background:var(--rule);margin:14px 0 16px;}
-.ev-desc{font-size:15px;line-height:1.72;color:var(--ink);}
+.ev-desc{font-size:15px;line-height:1.6;color:var(--ink);}
+.ev-desc p,.acc-desc p{margin:0 0 .6em;}
+.ev-desc p:last-child,.acc-desc p:last-child{margin-bottom:0;}
 
 .ev-illo{display:flex;justify-content:center;align-items:center;
   align-self:center; /* vertically centre the artwork in the space between the header rule and the timeline */}
@@ -15389,9 +15391,9 @@ var MS=[
   {id:4, year:1971, title:"International reintegration of the PRC", asset:"1971",
    desc:"In 1971, the PRC replaced the ROC (based in Taiwan) as China’s representative to the UN and gained a permanent seat in the UN Security Council. With this formal recognition of the PRC by the UN, other countries started to establish relations with it. Among these was the US, with secretary of state Henry Kissinger visiting China in the same year. The US ping-pong team and accompanying journalists also became some of the first Americans allowed to enter China since 1945."},
   {id:5, year:1972, title:"The Shanghai Communiqué", asset:"1972",
-   desc:"During President Richard Nixon’s visit in February 1972, the US and China issued the Shanghai Communiqué, a joint statement aimed at normalising relations between the two countries after 23 years of hostility. While recognising their differences, this statement confirmed their commitment to peaceful coexistence, respect for sovereignty and the development of bilateral trade. It also included mutual opposition to any single country having a hegemony in the Asia-Pacific region—a thinly veiled reference to the Soviet Union. The question of Taiwan was front of mind in the Communiqué, with it being highlighted as the crucial obstruction to the normalisation of relations. The PRC rejected any “two Chinas” formulation, declaring that Taiwan is a province of China and that the government of the PRC was the sole legal government of China."},
+   desc:"During President Richard Nixon’s visit in February 1972, the US and China issued the Shanghai Communiqué, a joint statement aimed at normalising relations between the two countries after 23 years of hostility. While recognising their differences, this statement confirmed their commitment to peaceful coexistence, respect for sovereignty and the development of bilateral trade. It also included mutual opposition to any single country having a hegemony in the Asia-Pacific region—a thinly veiled reference to the Soviet Union.\n\nThe question of Taiwan was front of mind in the Communiqué, with it being highlighted as the crucial obstruction to the normalisation of relations. The PRC rejected any “two Chinas” formulation, declaring that Taiwan is a province of China and that the government of the PRC was the sole legal government of China. The US, in turn, acknowledged “that all Chinese on either side of the Taiwan Strait maintain there is but one China and that Taiwan is a part of China” (Joint Communiqué of the United States of America and the People’s Republic of China, 1972). The US also noted that it intended to remove its military personnel from Taiwan.\n\nAlthough the Shanghai Communiqué was an important milestone, it would take a few years for relations to become normalised."},
   {id:6, year:1979, title:"Official diplomatic relations", asset:"1979",
-   desc:"On January 1st 1979, during Jimmy Carter’s presidency, the US and China established official diplomatic relations, with embassies planned to open on March 1st. The US officially recognised the PRC as the sole legal government of China and withdrew diplomatic recognition from the Republic of China (based in Taiwan). The US acknowledged China’s position that Taiwan is part of China but did not go so far as to recognise Chinese sovereignty over Taiwan. This is known as its “One-China policy”. In April 1979, the US Congress approved the Taiwan Relations Act (TRA) to allow for continued economic, military and cultural relations, despite the suspension of diplomatic relations."},
+   desc:"On January 1st 1979, during Jimmy Carter’s presidency, the US and China established official diplomatic relations, with embassies planned to open on March 1st. The US officially recognised the PRC as the sole legal government of China and withdrew diplomatic recognition from the Republic of China (based in Taiwan). The US acknowledged China’s position that Taiwan is part of China but did not go so far as to recognise Chinese sovereignty over Taiwan. This is known as its “One-China policy”.\n\nIn April 1979, the US Congress approved the Taiwan Relations Act (TRA) to allow for continued economic, military and cultural relations, despite the suspension of diplomatic relations.\n\nEach subsequent US administration has reaffirmed its commitment both to the One-China policy and the TRA. Tensions arose in 2016, when President-elect Donald Trump questioned the US’ One-China policy and disregarded established practice by speaking with Taiwanese President Tsai Ing-wen via telephone. Tensions were smoothed over after his inauguration when he reaffirmed the One-China policy in a call with Chinese President Xi Jinping."},
   {id:7, year:1991, title:"Collapse of the Soviet Union", asset:"1991",
    desc:"Following the collapse of the Soviet Union, the US became the dominant superpower in the world. Although the fall of a fellow communist dictatorship perturbed Chinese leaders, with hard-liners using it as a warning against any loosening of the ruling party’s grip, Deng Xiaoping (China’s paramount leader from 1978) continued with his programme of economic liberalisation, which eventually allowed hundreds of millions of Chinese to lift themselves out of poverty. Rapid growth raised China’s status as a world power."},
   {id:8, year:2000, title:"Normalised trade relations", asset:"2000",
@@ -15403,11 +15405,11 @@ var MS=[
   {id:11, year:2013, title:"China becomes, by one measure, the world’s largest economy", asset:"2013",
    desc:"China’s continued economic growth reached a milestone in 2013 when it became the world’s largest economy based on purchasing-power parity. This aligned well with China’s new president Xi Jinping’s call for the rejuvenation of the Chinese nation in November 2012."},
   {id:12, year:2015, title:"Tensions in the South China Sea", asset:"2015",
-   desc:"The South China Sea, rich in natural gas and a key route for global commercial shipping, has long been a point of dispute. In 2015, US surveillance pictures showed China rapidly reclaiming land in the South China Sea by pouring sand onto disputed reefs to turn them into islands. This went against a 2002 agreement with ASEAN to exercise self-restraint when it came to territorial disputes in the South China Sea."},
+   desc:"The South China Sea, rich in natural gas and a key route for global commercial shipping, has long been a point of dispute. Countries such as China, Vietnam, Malaysia, the Philippines and Taiwan have all laid overlapping claims to its various islets, reefs and economic zones. In 2015, US surveillance pictures showed China rapidly reclaiming land in the South China Sea by pouring sand onto disputed reefs to turn them into islands. This went against a 2002 agreement with the Association of South-East Asian Nations (ASEAN) to exercise self-restraint when it came to territorial disputes in the South China Sea.\n\nChina seemed to be building airstrips and harbours, and placing military equipment, on this reclaimed land. With tensions in the region rising, and fears over China’s fast-expanding military power growing, the US called for a halt to China’s controversial land reclamation and militarisation of the South China Sea. The US even sent warships close to the Chinese-claimed areas on freedom-of-navigation operations."},
   {id:13, year:2016, title:"The US and China co-operate on climate change", asset:"2016",
-   desc:"President Barack Obama and President Xi Jinping joined forces in combating climate change. In 2016, they both consulted with the United Nations secretary-general, Ban Ki-moon, and joined the Paris Agreement; 55 countries were required to join the agreement, representing 55% of the world’s greenhouse-gas emissions, before it could enter into force."},
+   desc:"President Barack Obama and President Xi Jinping joined forces in combating climate change. In 2016, they both consulted with the United Nations secretary-general, Ban Ki-moon, and joined the Paris Agreement; 55 countries were required to join the agreement, representing 55% of the world’s greenhouse-gas emissions, before it could enter into force. The US and China are responsible for almost 39% of the world’s emissions, making their participation particularly significant."},
   {id:14, year:2018, title:"The US-China trade war", asset:"2018",
-   desc:"At the start of his presidency, Trump touted that progress was being made with US-China relations. However, in 2018, a trade war erupted when the Trump administration announced sweeping tariffs on imported Chinese products, worth $50bn, in response to China’s alleged intellectual-property theft and unfair industrial policy. China retaliated in kind and accused the US of violating global trading rules."},
+   desc:"At the start of his presidency, Trump touted that progress was being made with US-China relations. However, in 2018, a trade war erupted when the Trump administration announced sweeping tariffs on imported Chinese products, worth $50bn, in response to China’s alleged intellectual-property theft and unfair industrial policy. China retaliated in kind and accused the US of violating global trading rules. The trade war escalated throughout the next two years, with tit-for-tat tariff increases and accusations of wrongdoing on both sides, as the US opted for competition rather than co-operation."},
   {id:15, year:2020, title:"The covid-19 pandemic", asset:"2020",
    desc:"After reports of a new coronavirus in the Chinese city of Wuhan, the Trump administration banned all non-citizens who had recently visited mainland China from entering the US. As the covid-19 pandemic spread across the world, the US and China blamed each other for the outbreak. A Chinese foreign-ministry spokesperson baselessly accused the US military of bringing the virus to China; Trump blamed the Chinese government for covering up the initial outbreak and failing to stop the spread of what he called the “Chinese virus”."}
 ];
@@ -15738,6 +15740,12 @@ function buildTrack(id){
   });
 }
 
+/* Event text may contain paragraph breaks (blank line in the data) */
+function setParas(el,text){
+  el.textContent='';
+  String(text).split(/\n\n/).forEach(function(t){ var p=document.createElement('p'); p.textContent=t; el.appendChild(p); });
+}
+
 var visited={};
 
 /* ── Mobile accordion timeline ───────────────────────────────── */
@@ -15779,7 +15787,7 @@ function buildAccordion(){
 
     var yrLg=document.createElement('div'); yrLg.className='acc-year-lg'; yrLg.textContent=m.year;
     var tlLg=document.createElement('div'); tlLg.className='acc-title-lg'; tlLg.textContent=m.title;
-    var dsc=document.createElement('div'); dsc.className='acc-desc'; dsc.textContent=m.desc;
+    var dsc=document.createElement('div'); dsc.className='acc-desc'; setParas(dsc,m.desc);
 
     panel.appendChild(illo); panel.appendChild(yrLg);
     panel.appendChild(tlLg); panel.appendChild(dsc);
@@ -15815,12 +15823,12 @@ function fitScreens(){
   els.forEach(function(el){ el.classList.add('is-active'); el.style.minHeight='0'; });
   var max=Math.max(base, Math.ceil(els[0].getBoundingClientRect().height), Math.ceil(els[1].getBoundingClientRect().height));
   var ev=els[2], yr=document.getElementById('evYear'), ti=document.getElementById('evTitle'), de=document.getElementById('evDesc');
-  var oy=yr.textContent, ot=ti.textContent, od=de.textContent;
+  var oy=yr.textContent, ot=ti.textContent, od=de.innerHTML;
   MS.forEach(function(m){
-    yr.textContent=m.year; ti.textContent=m.title; de.textContent=m.desc;
+    yr.textContent=m.year; ti.textContent=m.title; setParas(de,m.desc);
     max=Math.max(max, Math.ceil(ev.getBoundingClientRect().height));
   });
-  yr.textContent=oy; ti.textContent=ot; de.textContent=od;
+  yr.textContent=oy; ti.textContent=ot; de.innerHTML=od;
   els.forEach(function(el,i){ if(!was[i]) el.classList.remove('is-active'); el.style.minHeight=''; });
   root.style.setProperty('--screen-min', Math.ceil(max)+'px');
 }
@@ -15904,13 +15912,13 @@ function selectEvent(id){
   setTimeout(function(){
     document.getElementById('evYear').textContent=m.year;
     document.getElementById('evTitle').textContent=m.title;
-    document.getElementById('evDesc').textContent=m.desc;
+    setParas(document.getElementById('evDesc'),m.desc);
     injectClear('evIlloInner', m.asset);       // FIX: clear before inject
     sizeIlloToAsset('evIlloInner', m.asset);
     evText.style.opacity='1'; evIllo.style.opacity='1';
     setActive(id);
     show('event');
-    announce(m.desc);
+    announce(m.desc.replace(/\n\n/g,' '));
   }, currentId===id ? 0 : 200);
 
   show('event');
