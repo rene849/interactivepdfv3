@@ -20,6 +20,7 @@
   --blue:#2E45B8; --teal:#36E2BD; --cream:#EBE9E0;
   --ink:#0E0C0C; --muted:#5a5f73; --rule:#d7d9e0;
   --mb-shadow-offset-sm:0 4px 8px 0 rgba(13, 13, 13, 0.15); /* brand guide: Offset shadow (Small) */
+  --mb-shadow-frame:var(--mb-shadow-offset-sm), 0 0 6px 0 rgba(13, 13, 13, 0.10); /* + faint ambient layer so the top edge is visible */
   --maxw:1320px;
   --pad:clamp(18px,4vw,52px);
   --screen-height:580px;
@@ -31,7 +32,7 @@ html, body{background:#fff !important;color:var(--ink) !important;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
 body{font-family:'Noto Sans',Arial,sans-serif;background:#fff;
-  color:var(--ink);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+  color:var(--ink);-webkit-font-smoothing:antialiased;}
 button{font-family:inherit;cursor:pointer;border:none;background:none;touch-action:manipulation;}
 :focus-visible{outline:3px solid var(--red);outline-offset:3px;border-radius:2px;}
 
@@ -39,7 +40,8 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;touch-acti
    Screens size to their real content (not a fixed 100vh) so the iframe can
    be resized to match exactly — no leftover white space, no internal
    scrollbar. See the height-reporting script near the end of the file. */
-html,body{overflow-x:hidden;;overflow-y:hidden;}
+html{overflow-x:hidden;overflow-y:auto;} /* auto: if the host frame is ever too short, content scrolls instead of being cut off */
+body{overflow:visible;}
 .screen{display:none;}
 /* height:100vh + overflow:hidden creates the stacking context for sticky */
 .screen.is-active{
@@ -538,6 +540,10 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
 @media(min-width:561px) and (max-width:1099px){
   .work-body{align-items:start;}
   .ev-illo{align-self:start;}
+  /* cover: wider curve (tighter side padding), full-size Start button, more air under the title */
+  #cover .cover-stage{padding-left:20px;padding-right:20px;}
+  #cover .cover-title{margin-bottom:28px;}
+  #cover .btn-start{min-width:152px;}
 }
 /* Phone frames: full width. The graphic spans the frame, title sits at the top
    and the Start button at the bottom. */
@@ -550,7 +556,7 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
   #cover .btn-start{width:100%;margin-top:0;}
 }
 /* ── Whole-interaction frame: brand Offset shadow (Small), 8px radius ─── */
-body{margin:8px !important;border-radius:8px;box-shadow:var(--mb-shadow-offset-sm);}
+body{margin:8px !important;border-radius:8px;box-shadow:var(--mb-shadow-frame);}
 /* Phones: the page always reserves its scrollbar, so text width (and therefore
    height) cannot change when the content length changes — this stops the
    scrollbar-driven width/height loop that made headings twitch. */
@@ -13117,8 +13123,7 @@ body{margin:8px !important;border-radius:8px;box-shadow:var(--mb-shadow-offset-s
   <div data-ill="2020"><svg id="y2020-root" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 271.3 271.5"
 	 xml:space="preserve">
 <style>#y2020-root .st0{fill:#141F52;}#y2020-root .st1{fill:#1F2E7A;}#y2020-root .st2{fill:#475ED1;}#y2020-root .st3{clip-path:url(#y2020-SVGID_2_);fill:#475ED1;}#y2020-root .st4{fill:#1DC9A4;}#y2020-root .st5{fill:#36E2BD;}#y2020-root .st6{fill:#63EAC6;}#y2020-root .st7{opacity:0.2;fill:#E9FCF8;}#y2020-root .st8{fill:#C91D42;}#y2020-root .st9{fill:#D2F9F0;}#y2020-root .st10{clip-path:url(#SVGID_4_);fill:#475ED1;}
-/* Timeline visible within iframe bounds */
-body{overflow-y:hidden;}
+
 
 </style>
 <defs>
