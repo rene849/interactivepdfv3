@@ -19,6 +19,7 @@
   --red:#E3120B; --navy:#1F2E7A; --navy-deep:#141F52;
   --blue:#2E45B8; --teal:#36E2BD; --cream:#EBE9E0;
   --ink:#0E0C0C; --muted:#5a5f73; --rule:#d7d9e0;
+  --mb-shadow-offset-sm:0 4px 8px 0 rgba(13, 13, 13, 0.15); /* brand guide: Offset shadow (Small) */
   --maxw:1320px;
   --pad:clamp(18px,4vw,52px);
   --screen-height:580px;
@@ -548,8 +549,8 @@ html,body{overflow-x:hidden;;overflow-y:hidden;}
   #cover .cover-art-mobile{display:block;width:100%;aspect-ratio:300/280;margin:auto 0;position:relative;}
   #cover .btn-start{width:100%;margin-top:0;}
 }
-/* ── Whole-interaction frame: light shadow, 8px radius ───────────────── */
-body{margin:8px !important;border-radius:8px;box-shadow:0 0 6px 0 rgba(13,13,13,0.14),0 4px 8px 0 rgba(13,13,13,0.15);}
+/* ── Whole-interaction frame: brand Offset shadow (Small), 8px radius ─── */
+body{margin:8px !important;border-radius:8px;box-shadow:var(--mb-shadow-offset-sm);}
 /* Phones: the page always reserves its scrollbar, so text width (and therefore
    height) cannot change when the content length changes — this stops the
    scrollbar-driven width/height loop that made headings twitch. */
