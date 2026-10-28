@@ -78,7 +78,7 @@ body{overflow:visible;}
    no drop shadow, not touching either side of the frame. */
 .appbar-inner::after{
   content:'';position:absolute;left:var(--pad);right:var(--pad);bottom:0;
-  height:1px;background:var(--rule);
+  height:2px;background:#eaeaea;
 }
 .appbar-logo{display:none;}
 .appbar-divider{display:none;}
@@ -120,8 +120,8 @@ body{overflow:visible;}
   grid-area:1/1;align-self:center;justify-self:start;
   position:relative;z-index:5;max-width:clamp(300px,42%,560px);
 }
-.cover-title{font-size:clamp(34px,4.2vw,56px);font-weight:800;
-  line-height:1.08;letter-spacing:-.02em;color:var(--ink);
+.cover-title{font-size:clamp(34px,4.2vw,56px);font-weight:700;
+  line-height:1.35;letter-spacing:0;color:var(--ink);
   margin-bottom:24px;}
 .btn-start{
   display:inline-flex;align-items:center;justify-content:center;
@@ -236,7 +236,7 @@ body{overflow:visible;}
   color:var(--red);letter-spacing:-.02em;line-height:1;flex:none;}
 .ev-title{font-size:clamp(16px,1.8vw,22px);font-weight:800;
   letter-spacing:-.015em;line-height:1.22;color:var(--ink);}
-.ev-rule{height:1px;background:var(--rule);margin:14px 0 16px;}
+.ev-rule{height:2px;background:#eaeaea;margin:14px 0 16px;}
 .ev-desc{font-size:15px;line-height:1.6;color:var(--ink);}
 .ev-desc p,.acc-desc p{margin:0 0 .6em;}
 .ev-desc p:last-child,.acc-desc p:last-child{margin-bottom:0;}
@@ -15666,8 +15666,8 @@ var INTRO_DOTS=[
   {s:1511.75,r: 7.5},{s:1892.75,r:10.0},{s:2152.00,r: 9.1},
   {s:2521.00,r: 9.1},{s:2796.00,r: 8.9},{s:3037.00,r:13.3}
 ];
-var INTRO_SPEED = 210;   /* units per second the travelling dot moves at */
-var INTRO_PAUSE = 0.3;   /* seconds it stops at each dot while the dot swells */
+var INTRO_SPEED = 190;   /* units per second the travelling dot moves at */
+var INTRO_PAUSE = 0;     /* the travelling dot flows through each dot without stopping */
 var INTRO_TRAVELLER = {r:4.6, startS:800, endS:3171.75}; /* ends as the last dot, fully visible, a fixed distance before the arrowhead */
 var introRunId = 0;
 /* Medium/narrow frames: same three-run curve, drawn taller (1200 x 1000) so the
