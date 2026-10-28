@@ -15281,7 +15281,7 @@ body{margin:8px !important;border-radius:8px;box-shadow:var(--mb-shadow-frame);}
           <circle class="node" cx="737" cy="93.7" r="9" style="opacity:0;"/>
           <circle class="node" cx="797" cy="134.2" r="6" style="opacity:0;"/>
           <circle class="node" cx="1145" cy="193.2" r="9" style="opacity:0;"/>
-          <circle class="node" cx="1133" cy="236.0" r="4" style="opacity:0;"/>
+          <circle class="node" cx="592.5" cy="337.3" r="8" style="opacity:0;"/>
           <circle class="node" cx="827" cy="420.0" r="8" style="opacity:0;"/>
           <circle class="node" cx="972" cy="420.0" r="13" style="opacity:0;"/>
         </svg>
@@ -15593,6 +15593,23 @@ function animateCover(){
   var L = road.getTotalLength();
   road.style.strokeDasharray  = L;
 
+  /* distance along the road nearest each node; nodes are snapped onto the line so they never sit off it */
+  function sAt(x,y){
+    var best=0, bd=1e18;
+    for(var s=0;s<=L;s+=0.5){
+      var q=road.getPointAtLength(s), d=(q.x-x)*(q.x-x)+(q.y-y)*(q.y-y);
+      if(d<bd){ bd=d; best=s; }
+    }
+    return best;
+  }
+  var nodeS = [];
+  nodes.forEach(function(n){
+    var sv = sAt(+n.getAttribute('cx'), +n.getAttribute('cy'));
+    var q = road.getPointAtLength(sv);
+    n.setAttribute('cx', q.x.toFixed(2)); n.setAttribute('cy', q.y.toFixed(2));
+    nodeS.push(sv);
+  });
+
   if(reduced || !artShown){
     // Immediately show everything — no motion at all (also used where the
     // stacked mobile art is shown instead, which is static)
@@ -15606,22 +15623,12 @@ function animateCover(){
     return;
   }
 
-  /* distance along the road at which each node sits, so it can pop when the line arrives */
-  function sAt(x,y){
-    var best=0, bd=1e18;
-    for(var s=0;s<=L;s+=2){
-      var q=road.getPointAtLength(s), d=(q.x-x)*(q.x-x)+(q.y-y)*(q.y-y);
-      if(d<bd){ bd=d; best=s; }
-    }
-    return best;
-  }
-
   road.style.strokeDashoffset = L;
   road.animate([{strokeDashoffset:L},{strokeDashoffset:0}],
     {duration:DRAW,easing:'linear',fill:'forwards'});
   arrow.animate([{opacity:0},{opacity:1}],{duration:200,delay:DRAW-200,fill:'forwards'});
-  nodes.forEach(function(n){
-    var s = sAt(+n.getAttribute('cx'), +n.getAttribute('cy'));
+  nodes.forEach(function(n,i){
+    var s = nodeS[i];
     n.animate([{opacity:0,transform:'scale(.2)'},{opacity:1,transform:'scale(1)'}],
       {duration:200,delay:Math.max(0, DRAW*s/L-60),easing:'ease-out',fill:'both'});
   });
@@ -15632,8 +15639,14 @@ function animateCover(){
     }, THUMB_AT[i]);
   });
   /* title, then the Start button, fade in once the drawing has finished */
-  if(title) title.animate([{opacity:0},{opacity:1}],{duration:850,delay:4850,easing:'linear',fill:'both'});
-  if(btn)   btn.animate([{opacity:0},{opacity:1}],{duration:800,delay:5800,easing:'linear',fill:'both'});
+  function rise(el,delay,dur){
+    if(!el) return;
+    el.animate([{opacity:0},{opacity:1}],{duration:dur,delay:delay,easing:'linear',fill:'both'});
+    el.animate([{transform:'translateY(80px)'},{transform:'translateY(0)'}],
+      {duration:750,delay:delay,easing:'cubic-bezier(.25,.46,.45,.94)',fill:'both'});
+  }
+  rise(title,4850,900);
+  rise(btn,5800,800);
 }
 
 /* ── Intro S-curve ─────────────────────────────────────────────
@@ -15649,17 +15662,13 @@ var INTRO_D = "M 0 30 H 940 a60 60 0 0 1 0 120 H 600 a60 60 0 0 0 0 120 H 1199";
    hold = how long the travelling dot rests while the dot swells (0 = it keeps going) */
 var L0 = 3243.71;
 var INTRO_DOTS=[
-  {s: 878.25,r: 6.7,t: 0.50,hold:0 },
-  {s:1151.00,r:15.1,t: 2.10,hold:.2},
-  {s:1431.25,r:10.0,t: 4.10,hold:.2},
-  {s:1511.75,r: 7.5,t: 4.63,hold:0 },
-  {s:1892.75,r:10.0,t: 7.20,hold:.2},
-  {s:2152.00,r: 9.1,t: 8.90,hold:.2},
-  {s:2521.00,r: 9.1,t:11.50,hold:.2},
-  {s:2796.00,r: 8.9,t:13.40,hold:.2},
-  {s:3037.00,r:13.3,t:15.00,hold:.2}
+  {s: 878.25,r: 6.7},{s:1151.00,r:15.1},{s:1431.25,r:10.0},
+  {s:1511.75,r: 7.5},{s:1892.75,r:10.0},{s:2152.00,r: 9.1},
+  {s:2521.00,r: 9.1},{s:2796.00,r: 8.9},{s:3037.00,r:13.3}
 ];
-var INTRO_TRAVELLER = {r:4.6, startS:800, endS:3171.75, endT:15.9}; /* ends as the last dot, fully visible, a fixed distance before the arrowhead */
+var INTRO_SPEED = 210;   /* units per second the travelling dot moves at */
+var INTRO_PAUSE = 0.3;   /* seconds it stops at each dot while the dot swells */
+var INTRO_TRAVELLER = {r:4.6, startS:800, endS:3171.75}; /* ends as the last dot, fully visible, a fixed distance before the arrowhead */
 var introRunId = 0;
 /* Medium/narrow frames: same three-run curve, drawn taller (1200 x 1000) so the
    box can fill the right-hand column without distorting the arcs or dots. */
@@ -15721,6 +15730,18 @@ function drawIntro(){
   }
 
   // Dots, each swelling into place as the travelling dot reaches it
+  var T = INTRO_TRAVELLER;
+  var kf=[{t:0,s:T.startS}], tt=0, prevS=T.startS;
+  INTRO_DOTS.forEach(function(d){
+    tt += (d.s-prevS)/INTRO_SPEED; prevS=d.s;
+    d.t = tt;                               /* arrival */
+    kf.push({t:tt,s:d.s});
+    tt += INTRO_PAUSE;                      /* pause while the dot swells */
+    kf.push({t:tt,s:d.s});
+  });
+  tt += (T.endS-prevS)/INTRO_SPEED;
+  kf.push({t:tt,s:T.endS});
+  var END_T = tt;
   INTRO_DOTS.forEach(function(d){
     var p2=path.getPointAtLength(d.s*k);
     var circ=document.createElementNS(NS,'circle');
@@ -15739,7 +15760,6 @@ function drawIntro(){
   });
 
   // The travelling dot: runs along the curve, swells into each dot, and finally rests as the last dot
-  var T = INTRO_TRAVELLER;
   var trav=document.createElementNS(NS,'circle');
   trav.setAttribute('r',T.r);
   trav.setAttribute('class','traveler');
@@ -15756,24 +15776,18 @@ function drawIntro(){
     return;
   }
   trav.style.opacity='0';
-  var kf=[{t:0,s:T.startS,hide:false}];
-  INTRO_DOTS.forEach(function(d){
-    kf.push({t:d.t,s:d.s,hide:false});
-    if(d.hold) kf.push({t:d.t+d.hold,s:d.s,hide:true});   /* rests (hidden inside the swelling dot) */
-  });
-  kf.push({t:T.endT,s:T.endS,hide:false});
   var t0 = performance.now()+LEAD;
   function frame(now){
     if(run!==introRunId || !trav.isConnected) return;     /* slide was left or redrawn */
     var t=(now-t0)/1000;
     if(t<0){ requestAnimationFrame(frame); return; }
-    if(t>=T.endT){ place(T.endS); trav.style.opacity='1'; return; }
+    if(t>=END_T){ place(T.endS); trav.style.opacity='1'; return; }
     var i=0;
     while(i<kf.length-2 && t>=kf[i+1].t) i++;
     var a=kf[i], b=kf[i+1];
     var u=(b.t>a.t)?(t-a.t)/(b.t-a.t):1;
     place(a.s+(b.s-a.s)*u);
-    trav.style.opacity = (b.hide && b.s===a.s) ? '0' : String(Math.min(1,t/.25));
+    trav.style.opacity = String(Math.min(1,t/.25));
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
