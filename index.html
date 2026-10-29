@@ -330,10 +330,11 @@ body{overflow:visible;}
 
 /* ── BIB MODAL ── */
 .bib-overlay{
-  display:none;position:fixed;inset:0;
+  display:none;position:absolute;inset:0;  /* exactly the interaction frame (the body), never larger */
+  border-radius:8px;                       /* same corner radius as the frame; the pop-up itself stays square */
   background:rgba(179,179,179,.89); /* flat grey, no blur, as in the original */
   z-index:200;align-items:center;justify-content:center;
-  padding:clamp(12px,5.2vw,80px);
+  padding:24px clamp(12px,5.2vw,80px);
 }
 .bib-overlay.open{display:flex;}
 .bib-box{
@@ -352,10 +353,14 @@ body{overflow:visible;}
 .bib-close{flex:none;} /* circular icon styling comes from .icon-btn */
 .bib-body{
   flex:1 1 auto;min-height:0;
-  padding:8px 12px 0 0;overflow-y:auto;overflow-x:hidden;
-  scrollbar-width:thin;scrollbar-color:#c3c7d3 transparent;
+  margin-top:10px;padding:23px 14px 0 0;overflow-y:auto;overflow-x:hidden;
   font-size:15px;line-height:1.6;color:var(--ink);font-weight:400;
 }
+/* scrollbar in the original's greys: mid-grey thumb on a near-white track */
+.bib-body::-webkit-scrollbar{width:13px;}
+.bib-body::-webkit-scrollbar-track{background:#fcfcfc;}
+.bib-body::-webkit-scrollbar-thumb{background:#8b8b8b;border-radius:7px;border:2px solid #fcfcfc;}
+@supports (-moz-appearance:none){.bib-body{scrollbar-width:thin;scrollbar-color:#8b8b8b #fcfcfc;}}
 /* Hanging indent: first line flush left, wrapped lines indented; no rules between entries */
 .bib-entry{margin:0 0 14px;padding:0 0 0 18px;text-indent:-18px;border:0;overflow-wrap:anywhere;}
 .bib-entry:last-child{margin-bottom:0;}
@@ -577,7 +582,7 @@ body{overflow:visible;}
   #cover .btn-start{width:100%;margin-top:0;}
 }
 /* ── Whole-interaction frame: brand Offset shadow (Small), 8px radius ─── */
-body{margin:8px !important;border-radius:8px;box-shadow:var(--mb-shadow-frame);}
+body{margin:8px !important;border-radius:8px;box-shadow:var(--mb-shadow-frame);position:relative;}
 /* Phones: the page always reserves its scrollbar, so text width (and therefore
    height) cannot change when the content length changes — this stops the
    scrollbar-driven width/height loop that made headings twitch. */
