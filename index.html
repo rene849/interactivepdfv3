@@ -295,9 +295,14 @@ body{overflow:visible;}
   flex-shrink:0;display:grid;place-items:center;cursor:pointer;
   transition:background .1s,border-color .1s;
 }
-/* hover, keyboard focus and visited all share the original's soft grey fill, and the
-   year underneath grows slightly (no colour change, no lift) */
-.tl-btn:hover,.tl-btn:focus-visible,.tl-btn.visited{background:#e6eaee;}
+/* hover (mouse only) and keyboard focus share the original's soft grey fill, and the
+   year underneath grows slightly (no colour change, no lift).
+   There is deliberately NO persistent "visited" style: once a circle is no longer
+   hovered, focused or active it returns to its normal white look.
+   Hover is limited to devices that really hover, so a tap on a touchscreen
+   can't leave the circle stuck grey. */
+.tl-btn:focus-visible{background:#e6eaee;}
+@media (hover:hover){ .tl-btn:hover{background:#e6eaee;} }
 /* pressed: white fill with a teal outline */
 .tl-btn:active{background:#fff;border-color:var(--teal);border-width:2px;}
 /* selected: navy fill, the teal outline replaces the border (same outer size, no halo) */
@@ -307,9 +312,8 @@ body{overflow:visible;}
 }
 .tl-year{font-size:13px;font-weight:700;color:var(--ink);margin-top:3px;white-space:nowrap;
   transform-origin:50% 50%;transition:transform .2s ease;}
-.tl-btn:hover + .tl-node-text .tl-year,
-.tl-btn:focus-visible + .tl-node-text .tl-year,
-.tl-btn.visited + .tl-node-text .tl-year{transform:scale(1.13);}
+.tl-btn:focus-visible + .tl-node-text .tl-year{transform:scale(1.13);}
+@media (hover:hover){ .tl-btn:hover + .tl-node-text .tl-year{transform:scale(1.13);} }
 .tl-btn.active + .tl-node-text .tl-year{transform:none;}
 .tl-label{display:none;}
 .tl-node-text{display:flex;flex-direction:column;align-items:center;}
@@ -15993,7 +15997,6 @@ function setActive(activeId){
       if(!btn) return;
       btn.classList.toggle('active', m.id===activeId);
       if(m.id===activeId) btn.setAttribute('aria-current','step'); else btn.removeAttribute('aria-current');
-      btn.classList.toggle('visited', !!(visited[m.id] && m.id!==activeId));
     });
     // Scroll ONLY the .tl-scroll container — never the page.
     // Only scroll if the active button is outside the visible scroll area.
