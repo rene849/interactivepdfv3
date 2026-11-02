@@ -557,12 +557,15 @@ body{overflow:visible;}
 /* Phone frames: full width. The graphic spans the frame, title sits at the top
    and the Start button at the bottom. */
 @media(max-width:560px){
-  #cover{min-height:var(--screen-min,620px);}
-  #cover .cover-stage{display:flex;flex-direction:column;justify-content:space-between;flex:1;width:100%;max-width:none;padding:clamp(20px,4vh,36px) 18px;}
-  #cover .cover-text{display:flex;flex-direction:column;justify-content:space-between;flex:1;max-width:none;align-self:stretch;}
-  #cover .cover-title{margin:0;}
-  #cover .cover-art-mobile{display:block;width:100%;aspect-ratio:300/280;margin:auto 0;position:relative;}
-  #cover .btn-start{width:100%;margin-top:0;}
+  /* Spacing/scale taken from the original cover: 32px title in 3 lines, 27px to the art,
+     art box 256x230 at the button's width, 42px to a 47px-high button. All scale with width. */
+  #cover,#cover.is-active{min-height:0;}
+  #cover .cover-stage{display:flex;flex-direction:column;justify-content:flex-start;flex:none;width:100%;max-width:none;padding:18px 18px 28px;}
+  #cover .cover-text{display:flex;flex-direction:column;flex:none;max-width:none;align-self:stretch;}
+  #cover .cover-title{font-size:clamp(26px,10.25vw,40px);max-width:8em;margin:0 0 clamp(20px,8.6vw,32px);}
+  #cover .cover-title br{display:none;}
+  #cover .cover-art-mobile{display:block;width:100%;max-width:360px;aspect-ratio:256/230;margin:0 auto clamp(32px,13.4vw,50px);position:relative;}
+  #cover .btn-start{width:100%;height:47px;margin-top:0;}
 }
 /* ── Whole-interaction frame: brand Offset shadow (Small), 8px radius ─── */
 body{margin:8px !important;border-radius:8px;box-shadow:var(--mb-shadow-frame);position:relative;}
@@ -11836,23 +11839,29 @@ body{margin:8px !important;border-radius:8px;box-shadow:var(--mb-shadow-frame);p
 <div id="cover" class="screen is-active">
   <div class="cover-stage">
     <div class="cover-text">
-      <h2 id="covTitle" class="cover-title">The lead-up to the<br>US-China rivalry</h2>
+      <h2 id="covTitle" class="cover-title">The lead-up to the <br>US-China rivalry</h2>
       <!-- Mobile-only stacked art (between title and button) -->
       <div class="cover-art-mobile" aria-hidden="true">
-        <svg class="cover-path" viewBox="0 0 300 280" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+        <svg class="cover-path" viewBox="0 0 256 230" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
           <path class="road"
-            d="M 24 40 H 226 a50 50 0 0 1 0 100 H 78 a50 50 0 0 0 0 100 H 292"/>
-          <path class="arrowhead" d="M 285,234 L 293,240 L 285,246"/>
-          <circle class="node" cx="226" cy="40"  r="5"/>
-          <circle class="node" cx="112" cy="140" r="6"/>
-          <circle class="node" cx="78"  cy="240" r="5"/>
-          <circle class="node" cx="190" cy="240" r="6"/>
+            d="M 119 4.7 a8 8 0 0 0 8 8 H 184.7 a11.3 11.3 0 0 1 0 22.6 H 66.5 a17.5 17.5 0 0 0 0 35 H 206.1 a25.9 25.9 0 0 1 0 51.8 H 39.7 a35 35 0 0 0 0 70 H 252"/>
+          <path class="arrowhead" d="M 245.3,187.3 L 252,192 L 245.3,196.7"/>
+          <circle class="node" cx="119"   cy="4.7"  r="2.2"/>
+          <circle class="node" cx="170"   cy="13"   r="4"/>
+          <circle class="node" cx="107.7" cy="35.3" r="6.3"/>
+          <circle class="node" cx="48.7"  cy="52"   r="4"/>
+          <circle class="node" cx="78.7"  cy="70.3" r="4"/>
+          <circle class="node" cx="232.7" cy="96"   r="5"/>
+          <circle class="node" cx="182.7" cy="122"  r="4"/>
+          <circle class="node" cx="49"    cy="122"  r="5.7"/>
+          <circle class="node" cx="4"     cy="157"  r="4"/>
+          <circle class="node" cx="152.7" cy="192"  r="7.3"/>
         </svg>
-        <div id="th-m-china"  class="thumb" style="left:56%;top:14.3%;"></div>
-        <div id="th-m-helmet" class="thumb" style="left:28%;top:14.3%;"></div>
-        <div id="th-m-plane"  class="thumb" style="left:58%;top:50%;"></div>
-        <div id="th-m-ussr"   class="thumb" style="left:42%;top:85.7%;"></div>
-        <div id="th-m-globe"  class="thumb" style="left:80%;top:85.7%;"></div>
+        <!-- icon centres/sizes are % of the 256 x 230 art box, solved from the original cover -->
+        <div id="th-m-china"  class="thumb" style="left:65.1%;top:28.6%;width:22.9%;"></div>
+        <div id="th-m-plane"  class="thumb" style="left:50%;top:54.9%;width:32%;"></div>
+        <div id="th-m-ussr"   class="thumb" style="left:27.3%;top:85%;width:34.4%;"></div>
+        <div id="th-m-globe"  class="thumb" style="left:82.4%;top:84.5%;width:31.6%;"></div>
       </div>
       <button class="btn-start" data-action="intro" aria-label="Start the interactive timeline">Start</button>
     </div>
@@ -12393,7 +12402,7 @@ function drawIntro(){
    width, instead of thinning or thickening as the artwork scales. */
 var STROKE_PX = 1.5;  /* on-screen weight of the S-curve line; change here to tune */
 function scaleStrokes(){
-  [['#coverSvg',1272],['#introSvg',1284],['.cover-art-mobile .cover-path',300]].forEach(function(p){
+  [['#coverSvg',1272],['#introSvg',1284],['.cover-art-mobile .cover-path',256]].forEach(function(p){
     var svg=document.querySelector(p[0]); if(!svg) return;
     var w=svg.getBoundingClientRect().width; if(!w) return;
     var sw=(STROKE_PX/(w/p[1])).toFixed(2);
@@ -12740,7 +12749,6 @@ document.addEventListener('keydown',function(e){
   // Mobile cover thumbnails (same visual mapping, stacked art)
   var mThumbMap={
     'th-m-china' :'china',
-    'th-m-helmet':'1950',
     'th-m-plane' :'globe',
     'th-m-ussr'  :'helmet',
     'th-m-globe' :'money'
