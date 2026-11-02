@@ -115,12 +115,13 @@ body{overflow:visible;}
   /* centred in the frame; overflow stays visible so the lowest icons are not clipped */
   flex:1 0 auto;align-content:center;overflow:visible;
 }
+@media(min-width:1300px){.cover-title{font-size:56px;}}
 #cover .appbar{display:none;}
 .cover-text{
   grid-area:1/1;align-self:center;justify-self:start;
   position:relative;z-index:5;max-width:clamp(300px,42%,560px);
 }
-.cover-title{font-size:clamp(34px,4.2vw,56px);font-weight:700;
+.cover-title{font-size:clamp(34px,3.75vw,56px);font-weight:700;
   line-height:1.35;letter-spacing:0;color:var(--ink);
   margin-bottom:24px;}
 .btn-start{
@@ -399,7 +400,7 @@ body{overflow:visible;}
    just scaled. Text stays inside the left ~44% so it never meets the curve. */
 @media(min-width:561px) and (max-width:799px){
   .cover-text{max-width:44%;}
-  .cover-title{font-size:clamp(26px,4.4vw,34px);margin-bottom:24px;}
+  .cover-title{font-size:clamp(26px,3.9vw,34px);margin-bottom:24px;}
   .intro-copy{max-width:44%;}
   .intro-copy p{margin-bottom:10px;}
 }
@@ -584,6 +585,34 @@ body{margin:8px !important;border-radius:8px;box-shadow:var(--mb-shadow-frame);p
  #eventOuter .work-inner{padding-top:12px;padding-bottom:12px;}
  #eventOuter .work-body{padding-top:12px;padding-bottom:10px;}
  .ev-rule{margin:12px 0 12px;}
+}
+
+/* ── EVENT SLIDES: balanced text / image proportions ─────────────────────────────────────────
+   Text about 70% / image about 30% (the original is nearer 60/40 at this size), so the artwork is
+   large enough to hold the slide instead of sitting as a thin strip next to the text. The content
+   block is centred between the top bar and the timeline, the image is centred against the heading
+   + text block, and the tallest slide (1972) gets slightly tighter spacing so every slide can share
+   a shorter frame. Phone (≤560px) layout is untouched. */
+@media(min-width:561px){
+  .work-body{align-content:center;}
+  #eventOuter .ev-illo{align-self:center;}
+  .ev-rule{margin:11px 0 13px;}
+  #eventOuter .work-inner{padding-top:6px;padding-bottom:6px;}
+  #eventOuter .work-body{padding-top:8px;padding-bottom:8px;}
+}
+@media(min-width:1150px){
+  .work-body{grid-template-columns:minmax(0,1fr) clamp(280px,30%,400px);gap:clamp(28px,3.5vw,48px);}
+  .ev-illo-inner{max-width:400px;}
+}
+@media(min-width:800px) and (max-width:1149px){
+  .work-body{grid-template-columns:minmax(0,1fr) clamp(220px,32%,340px);gap:clamp(22px,2.6vw,36px);}
+  .ev-illo-inner{max-width:340px;}
+  .ev-desc{line-height:1.5;}
+}
+@media(min-width:561px) and (max-width:799px){
+  .work-body{grid-template-columns:minmax(0,1fr) clamp(170px,34%,270px);gap:22px;}
+  .ev-illo-inner{max-width:270px;}
+  .ev-desc{line-height:1.5;}
 }
 </style>
 </head>
@@ -11858,10 +11887,10 @@ body{margin:8px !important;border-radius:8px;box-shadow:var(--mb-shadow-frame);p
           <circle class="node" cx="152.7" cy="192"  r="7.3"/>
         </svg>
         <!-- icon centres/sizes are % of the 256 x 230 art box, solved from the original cover -->
-        <div id="th-m-china"  class="thumb" style="left:65.1%;top:28.6%;width:22.9%;"></div>
-        <div id="th-m-plane"  class="thumb" style="left:50%;top:54.9%;width:32%;"></div>
-        <div id="th-m-ussr"   class="thumb" style="left:27.3%;top:85%;width:34.4%;"></div>
-        <div id="th-m-globe"  class="thumb" style="left:82.4%;top:84.5%;width:31.6%;"></div>
+        <div id="th-m-china"  class="thumb" style="left:65.1%;top:28.6%;width:34%;"></div>
+        <div id="th-m-plane"  class="thumb" style="left:50%;top:54.9%;width:34%;"></div>
+        <div id="th-m-ussr"   class="thumb" style="left:27.3%;top:85%;width:34%;"></div>
+        <div id="th-m-globe"  class="thumb" style="left:82.4%;top:84.5%;width:34%;"></div>
       </div>
       <button class="btn-start" data-action="intro" aria-label="Start the interactive timeline">Start</button>
     </div>
@@ -12529,6 +12558,19 @@ function sizeAccordion(){
    below. Stretch the curve vertically so it fills about the same share of the frame height as on a
    normal desktop (~66%). Same curve, same branding: only the gaps between the rows grow.
    On a normal desktop the factor works out as 1, so nothing changes there. */
+/* The cover curve at height H. When the rows are pushed further apart the bends grow with them
+   (same proportions as the original, rx = 0.865 x ry), and each bend keeps its outermost point where it
+   was, so the bends stay smooth and round instead of turning into narrow pinched ovals. At H=420 this
+   is exactly the original path. */
+function coverPath(H){
+  var k=H/420, f=[0,46/363,116/363,220/363,1], y=f.map(function(v){return +(v*H).toFixed(2);});
+  var rx=[23*k,35*k,52*k,71.5*k].map(function(v){return +v.toFixed(2);});
+  var e1=+(1058-rx[0]).toFixed(2), e2=+(735+rx[1]).toFixed(2), e3=+(1145-rx[2]).toFixed(2), e4=+(592.5+rx[3]).toFixed(2);
+  return "M 0 "+y[0]+" H "+e1+" A "+rx[0]+" "+((y[1]-y[0])/2)+" 0 0 1 "+e1+" "+y[1]+
+         " H "+e2+" A "+rx[1]+" "+((y[2]-y[1])/2)+" 0 0 0 "+e2+" "+y[2]+
+         " H "+e3+" A "+rx[2]+" "+((y[3]-y[2])/2)+" 0 0 1 "+e3+" "+y[3]+
+         " H "+e4+" A "+rx[3]+" "+((y[4]-y[3])/2)+" 0 0 0 "+e4+" "+y[4]+" H 1272";
+}
 function fitCover(frameH){
   var wrap=document.getElementById('coverArtWrap');
   var svg=document.getElementById('coverSvg');
@@ -12537,11 +12579,11 @@ function fitCover(frameH){
   if(artW<50) return;
   var natural=artW*420/1272;
   var k=(0.66*frameH)/natural;
-  k = k<1.04 ? 1 : Math.min(2, k);
+  k = k<1.04 ? 1 : Math.min(1.6, k);
   var H=Math.round(420*k);
   document.documentElement.style.setProperty('--cover-h', H);
   svg.setAttribute('viewBox','0 0 1272 '+H);
-  document.getElementById('coverRoad').setAttribute('d', sCurvePath(H));
+  document.getElementById('coverRoad').setAttribute('d', coverPath(H));
   document.getElementById('coverArrow').setAttribute('d','M 1260,'+(H-10)+' L 1272,'+H+' L 1260,'+(H+10));
   /* nodes follow the curve's new height, then are snapped exactly onto the line */
   var road=document.getElementById('coverRoad'), L=road.getTotalLength();
