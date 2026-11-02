@@ -137,11 +137,11 @@ body{overflow:visible;}
    stage's height, at exactly the size its own width/aspect-ratio needs. */
 .cover-art{
   grid-area:1/1;align-self:center;justify-self:stretch;
-  width:100%;aspect-ratio:1272/420;
+  width:100%;aspect-ratio:1272/var(--cover-h,420);
   pointer-events:none;z-index:1;
 ;}
 .cover-art-inner{
-  position:relative;width:100%;aspect-ratio:1272/420;
+  position:relative;width:100%;aspect-ratio:1272/var(--cover-h,420);
 }
 /* Mobile cover art (stacked layout) — hidden on desktop */
 .cover-art-mobile{display:none;}
@@ -12190,7 +12190,8 @@ function animateCover(){
   var reduced = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
 
   var L = road.getTotalLength();
-  road.style.strokeDasharray  = L;
+  road.setAttribute('pathLength','1000');   /* dash maths independent of the curve's real length */
+  road.style.strokeDasharray  = 1000;
 
   /* distance along the road nearest each node; nodes are snapped onto the line so they never sit off it */
   function sAt(x,y){
@@ -12219,6 +12220,7 @@ function animateCover(){
     // Immediately show everything — no motion at all (also used where the
     // stacked mobile art is shown instead, which is static)
     road.style.strokeDashoffset = '0';
+    road.style.strokeDasharray  = 'none';
     arrow.style.opacity = '1';
     nodes.forEach(function(n){ n.style.opacity='1'; n.style.transform='scale(1)'; });
     thumbs.forEach(function(id){
@@ -12228,8 +12230,8 @@ function animateCover(){
     return;
   }
 
-  road.style.strokeDashoffset = L;
-  road.animate([{strokeDashoffset:L},{strokeDashoffset:0}],
+  road.style.strokeDashoffset = 1000;
+  road.animate([{strokeDashoffset:1000},{strokeDashoffset:0}],
     {duration:DRAW,easing:'linear',fill:'forwards'});
   arrow.animate([{opacity:0},{opacity:1}],{duration:200,delay:DRAW-200,fill:'forwards'});
   nodes.forEach(function(n,i){
@@ -12522,6 +12524,37 @@ function sizeAccordion(){
 /* Every screen gets the height of the tallest one at this width, so the
    frame never changes height between cover, intro and events. Event text is
    measured in place (text swapped and restored synchronously; nothing paints). */
+/* Cover balance: the S-curve normally scales with the frame's WIDTH only, so when the frame is
+   tall and narrow (both Moodle side menus open) it ends up small with lots of white above and
+   below. Stretch the curve vertically so it fills about the same share of the frame height as on a
+   normal desktop (~66%). Same curve, same branding: only the gaps between the rows grow.
+   On a normal desktop the factor works out as 1, so nothing changes there. */
+function fitCover(frameH){
+  var wrap=document.getElementById('coverArtWrap');
+  var svg=document.getElementById('coverSvg');
+  if(!wrap||!svg) return;
+  var artW=wrap.getBoundingClientRect().width;
+  if(artW<50) return;
+  var natural=artW*420/1272;
+  var k=(0.66*frameH)/natural;
+  k = k<1.04 ? 1 : Math.min(2, k);
+  var H=Math.round(420*k);
+  document.documentElement.style.setProperty('--cover-h', H);
+  svg.setAttribute('viewBox','0 0 1272 '+H);
+  document.getElementById('coverRoad').setAttribute('d', sCurvePath(H));
+  document.getElementById('coverArrow').setAttribute('d','M 1260,'+(H-10)+' L 1272,'+H+' L 1260,'+(H+10));
+  /* nodes follow the curve's new height, then are snapped exactly onto the line */
+  var road=document.getElementById('coverRoad'), L=road.getTotalLength();
+  svg.querySelectorAll('.node').forEach(function(n){
+    if(!n.hasAttribute('data-cy0')) n.setAttribute('data-cy0', n.getAttribute('cy'));
+    var x=+n.getAttribute('cx'), y=+n.getAttribute('data-cy0')*H/420, best=null, bd=1e18;
+    for(var s=0;s<=L;s+=0.5){
+      var q=road.getPointAtLength(s), d=(q.x-x)*(q.x-x)+(q.y-y)*(q.y-y);
+      if(d<bd){ bd=d; best=q; }
+    }
+    n.setAttribute('cx', best.x.toFixed(2)); n.setAttribute('cy', best.y.toFixed(2));
+  });
+}
 function fitScreens(){
   var root=document.documentElement;
   var w=window.innerWidth;
@@ -12530,6 +12563,7 @@ function fitScreens(){
   var els=['cover','intro','event'].map(function(id){return document.getElementById(id);});
   var was=els.map(function(el){return el.classList.contains('is-active');});
   /* measure with the same classes a real screen has (inactive screens lay out differently) */
+  root.style.setProperty('--cover-h', 420);   /* measure the cover at its natural size, then re-balance below */
   els.forEach(function(el){ el.classList.add('is-active'); el.style.minHeight='0'; });
   var max=Math.max(base, Math.ceil(els[0].getBoundingClientRect().height), Math.ceil(els[1].getBoundingClientRect().height));
   var ev=els[2], yr=document.getElementById('evYear'), ti=document.getElementById('evTitle'), de=document.getElementById('evDesc');
@@ -12539,6 +12573,7 @@ function fitScreens(){
     max=Math.max(max, Math.ceil(ev.getBoundingClientRect().height));
   });
   yr.textContent=oy; ti.textContent=ot; de.innerHTML=od;
+  fitCover(Math.ceil(max));
   els.forEach(function(el,i){ if(!was[i]) el.classList.remove('is-active'); el.style.minHeight=''; });
   root.style.setProperty('--screen-min', Math.ceil(max)+'px');
 }
