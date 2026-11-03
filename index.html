@@ -22,6 +22,7 @@
   --mb-shadow-offset-sm:0 4px 8px 0 rgba(13, 13, 13, 0.15); /* brand guide: Offset shadow (Small) */
   --mb-shadow-frame:var(--mb-shadow-offset-sm), 0 0 6px 0 rgba(13, 13, 13, 0.10); /* + faint ambient layer so the top edge is visible */
   --maxw:1320px;
+  --frame-max:1216px;   /* overall frame width: the original's frame measured about 1216px */
   --pad:clamp(18px,4vw,52px);
   --screen-height:580px;
   /* Force light rendering — illustrations designed for white background */
@@ -620,6 +621,13 @@ body{margin:8px !important;border-radius:8px;box-shadow:var(--mb-shadow-frame);p
   .ev-illo-inner{max-width:270px;}
   .ev-desc{line-height:1.5;}
 }
+
+/* ── FRAME WIDTH: sized to the content, as in the original (~1216px frame) rather than stretching across a wide Moodle page ── */
+body{max-width:var(--frame-max,1216px);margin:8px auto !important;}
+/* long descriptions: 75% text / 25% image */
+@media(min-width:1150px){.work-body.long{grid-template-columns:minmax(0,1fr) clamp(240px,25%,330px);}.work-body.long .ev-illo-inner{max-width:330px;}}
+@media(min-width:800px) and (max-width:1149px){.work-body.long{grid-template-columns:minmax(0,1fr) clamp(200px,26%,290px);}}
+@media(min-width:561px) and (max-width:799px){.work-body.long{grid-template-columns:minmax(0,1fr) clamp(150px,28%,230px);}}
 </style>
 </head>
 <body>
@@ -12576,6 +12584,8 @@ function buildTrack(id){
 
 /* Event text may contain paragraph breaks (blank line in the data) */
 function setParas(el,text){
+  /* long descriptions (1972, 1979, 2015...) get a 75 / 25 text-to-image split so they stay compact */
+  if(el.id==='evDesc'){ var wb=document.querySelector('#event .work-body'); if(wb) wb.classList.toggle('long', String(text).length>950); }
   el.textContent='';
   String(text).split(/\n\n/).forEach(function(t){ var p=document.createElement('p'); p.textContent=t; el.appendChild(p); });
 }
@@ -12652,7 +12662,7 @@ function sizeAccordion(){
    FIT_RESERVE = vertical pixels of a typical screen taken by the browser bar, the Moodle header and breathing
    room; FIT_MIN_ZOOM = never go smaller than this (keeps the text readable). Phones and the narrower
    "side menus open" widths are never scaled. */
-var FIT_RESERVE=292, FIT_MIN_ZOOM=0.84, FIT_MIN_WIDTH=1150;
+var FIT_RESERVE=262, FIT_MIN_ZOOM=0.92, FIT_MIN_WIDTH=1150;
 function applyFitZoom(frameH){
   var z=1;
   if(window.innerWidth>=FIT_MIN_WIDTH && window.screen && screen.availHeight){
