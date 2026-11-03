@@ -115,13 +115,13 @@ body{overflow:visible;}
   /* centred in the frame; overflow stays visible so the lowest icons are not clipped */
   flex:1 0 auto;align-content:center;overflow:visible;
 }
-@media(min-width:1300px){.cover-title{font-size:56px;}}
 #cover .appbar{display:none;}
 .cover-text{
   grid-area:1/1;align-self:center;justify-self:start;
   position:relative;z-index:5;max-width:clamp(300px,42%,560px);
 }
-.cover-title{font-size:clamp(34px,3.75vw,56px);font-weight:700;
+.nb{white-space:nowrap;}
+.cover-title{font-size:clamp(34px,4.2vw,56px);font-weight:700;
   line-height:1.35;letter-spacing:0;color:var(--ink);
   margin-bottom:24px;}
 .btn-start{
@@ -138,11 +138,11 @@ body{overflow:visible;}
    stage's height, at exactly the size its own width/aspect-ratio needs. */
 .cover-art{
   grid-area:1/1;align-self:center;justify-self:stretch;
-  width:100%;aspect-ratio:1272/var(--cover-h,420);
+  width:100%;aspect-ratio:var(--cover-ar,1272 / 420);
   pointer-events:none;z-index:1;
 ;}
 .cover-art-inner{
-  position:relative;width:100%;aspect-ratio:1272/var(--cover-h,420);
+  position:relative;width:100%;aspect-ratio:var(--cover-ar,1272 / 420);
 }
 /* Mobile cover art (stacked layout) — hidden on desktop */
 .cover-art-mobile{display:none;}
@@ -400,7 +400,7 @@ body{overflow:visible;}
    just scaled. Text stays inside the left ~44% so it never meets the curve. */
 @media(min-width:561px) and (max-width:799px){
   .cover-text{max-width:44%;}
-  .cover-title{font-size:clamp(26px,3.9vw,34px);margin-bottom:24px;}
+  .cover-title{font-size:clamp(26px,4.4vw,34px);margin-bottom:24px;}
   .intro-copy{max-width:44%;}
   .intro-copy p{margin-bottom:10px;}
 }
@@ -552,8 +552,14 @@ body{overflow:visible;}
   .ev-illo{align-self:start;}
   /* cover: wider curve (tighter side padding), full-size Start button, more air under the title */
   #cover .cover-stage{padding-left:20px;padding-right:20px;}
-  #cover .cover-title{margin-bottom:28px;}
+  #cover .cover-title{margin-bottom:28px;text-wrap:balance;}
+  #cover .cover-title br{display:none;}
   #cover .btn-start{min-width:152px;}
+}
+/* one-menu widths: same balanced title wrap (no orphaned word) */
+@media(min-width:1100px) and (max-width:1399px){
+  #cover .cover-title{text-wrap:balance;}
+  #cover .cover-title br{display:none;}
 }
 /* Phone frames: full width. The graphic spans the frame, title sits at the top
    and the Start button at the bottom. */
@@ -585,34 +591,6 @@ body{margin:8px !important;border-radius:8px;box-shadow:var(--mb-shadow-frame);p
  #eventOuter .work-inner{padding-top:12px;padding-bottom:12px;}
  #eventOuter .work-body{padding-top:12px;padding-bottom:10px;}
  .ev-rule{margin:12px 0 12px;}
-}
-
-/* ── EVENT SLIDES: balanced text / image proportions ─────────────────────────────────────────
-   Text about 70% / image about 30% (the original is nearer 60/40 at this size), so the artwork is
-   large enough to hold the slide instead of sitting as a thin strip next to the text. The content
-   block is centred between the top bar and the timeline, the image is centred against the heading
-   + text block, and the tallest slide (1972) gets slightly tighter spacing so every slide can share
-   a shorter frame. Phone (≤560px) layout is untouched. */
-@media(min-width:561px){
-  .work-body{align-content:center;}
-  #eventOuter .ev-illo{align-self:center;}
-  .ev-rule{margin:11px 0 13px;}
-  #eventOuter .work-inner{padding-top:6px;padding-bottom:6px;}
-  #eventOuter .work-body{padding-top:8px;padding-bottom:8px;}
-}
-@media(min-width:1150px){
-  .work-body{grid-template-columns:minmax(0,1fr) clamp(280px,30%,400px);gap:clamp(28px,3.5vw,48px);}
-  .ev-illo-inner{max-width:400px;}
-}
-@media(min-width:800px) and (max-width:1149px){
-  .work-body{grid-template-columns:minmax(0,1fr) clamp(220px,32%,340px);gap:clamp(22px,2.6vw,36px);}
-  .ev-illo-inner{max-width:340px;}
-  .ev-desc{line-height:1.5;}
-}
-@media(min-width:561px) and (max-width:799px){
-  .work-body{grid-template-columns:minmax(0,1fr) clamp(170px,34%,270px);gap:22px;}
-  .ev-illo-inner{max-width:270px;}
-  .ev-desc{line-height:1.5;}
 }
 </style>
 </head>
@@ -11868,7 +11846,7 @@ body{margin:8px !important;border-radius:8px;box-shadow:var(--mb-shadow-frame);p
 <div id="cover" class="screen is-active">
   <div class="cover-stage">
     <div class="cover-text">
-      <h2 id="covTitle" class="cover-title">The lead-up to the <br>US-China rivalry</h2>
+      <h2 id="covTitle" class="cover-title">The <span class="nb">lead-up</span> to the <br><span class="nb">US-China</span> rivalry</h2>
       <!-- Mobile-only stacked art (between title and button) -->
       <div class="cover-art-mobile" aria-hidden="true">
         <svg class="cover-path" viewBox="0 0 256 230" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
@@ -11887,10 +11865,10 @@ body{margin:8px !important;border-radius:8px;box-shadow:var(--mb-shadow-frame);p
           <circle class="node" cx="152.7" cy="192"  r="7.3"/>
         </svg>
         <!-- icon centres/sizes are % of the 256 x 230 art box, solved from the original cover -->
-        <div id="th-m-china"  class="thumb" style="left:65.1%;top:28.6%;width:34%;"></div>
-        <div id="th-m-plane"  class="thumb" style="left:50%;top:54.9%;width:34%;"></div>
-        <div id="th-m-ussr"   class="thumb" style="left:27.3%;top:85%;width:34%;"></div>
-        <div id="th-m-globe"  class="thumb" style="left:82.4%;top:84.5%;width:34%;"></div>
+        <div id="th-m-china"  class="thumb" style="left:65.1%;top:28.6%;width:22.9%;"></div>
+        <div id="th-m-plane"  class="thumb" style="left:50%;top:54.9%;width:32%;"></div>
+        <div id="th-m-ussr"   class="thumb" style="left:27.3%;top:85%;width:34.4%;"></div>
+        <div id="th-m-globe"  class="thumb" style="left:82.4%;top:84.5%;width:31.6%;"></div>
       </div>
       <button class="btn-start" data-action="intro" aria-label="Start the interactive timeline">Start</button>
     </div>
@@ -12185,6 +12163,7 @@ function show(id){
   screens.forEach(function(s){
     document.getElementById(s).classList.toggle('is-active', s===id);
   });
+  if(id==='cover') layoutCover();
   sizeAccordion(); /* panels can only be measured once the intro is visible */
   scaleStrokes();
   // Reset the scroller for whichever screen is now active (desktop, where
@@ -12197,6 +12176,72 @@ function show(id){
   // at blank space under the new, shorter screen, which looks exactly like
   // the tap did nothing.
   window.scrollTo(0,0);
+}
+
+/* ── Cover art fit ─────────────────────────────────────────────
+   The S-curve is drawn at 1272 x 420. Its horizontal positions are fixed and every vertical
+   position is a fixed fraction of the height, so it can be drawn taller without distortion
+   (the icons are positioned in % of the same box). In narrower frames (side menus open) the
+   cover screen is much taller than a width-scaled 1272:420 graphic and leaves big empty bands;
+   there the graphic is drawn taller so the curve fills the space. Full desktop (>=1400px) is
+   untouched. */
+var COVER_F=[0,0.126714,0.319548,0.606071,1];
+var COVER_FIT_MAX_W=1399;
+function coverFitRatio(w){ return w<700 ? 1.2 : 0.9; }   /* tallest allowed, as a multiple of the art's width */
+var COVER_D420='M 0 0.00 H 1035 A 23 26.61 0 0 1 1035 53.22 H 770 A 35 40.50 0 0 0 770 134.21 H 1093 A 52 60.17 0 0 1 1093 254.55 H 664 A 71.5 82.73 0 0 0 664 420.00 H 1272';
+var COVER_NODE420=[[880,880,0],[1154,994.04,53.22],[1437,735.55,93.84],[1522.5,796.79,134.21],
+                   [1906,1144.99,193.44],[2544.5,593.29,337.09],[2828,826.79,420],[2973,971.79,420]]; /* [distance along road, cx, cy] */
+var coverBusy=false, coverRelayout=false;
+function ellHalf(rx,ry){var n=120,sum=0,dt=Math.PI/n;for(var i=0;i<n;i++){var t=(i+.5)*dt,a=rx*Math.sin(t),b=ry*Math.cos(t);sum+=Math.sqrt(a*a+b*b)*dt;}return sum;}
+function coverRoadD(H){
+  var y=COVER_F.map(function(f){return f*H;});
+  function r(v){return (+v).toFixed(2);}
+  return 'M 0 0.00 H 1035 A 23 '+r((y[1]-y[0])/2)+' 0 0 1 1035 '+r(y[1])+
+         ' H 770 A 35 '+r((y[2]-y[1])/2)+' 0 0 0 770 '+r(y[2])+
+         ' H 1093 A 52 '+r((y[3]-y[2])/2)+' 0 0 1 1093 '+r(y[3])+
+         ' H 664 A 71.5 '+r((y[4]-y[3])/2)+' 0 0 0 664 '+r(y[4])+' H 1272';
+}
+/* [distance along road, cx, cy] of each node for a road of height H */
+function coverNodes(H){
+  var y=COVER_F.map(function(f){return f*H;});
+  var A=[ellHalf(23,(y[1]-y[0])/2),ellHalf(35,(y[2]-y[1])/2),ellHalf(52,(y[3]-y[2])/2),ellHalf(71.5,(y[4]-y[3])/2)];
+  var run2=1035+A[0], arc2=run2+265, run3=arc2+A[1], arc3=run3+323, run4=arc3+A[2], arc4=run4+429, run5=arc4+A[3];
+  return [
+    [880,              880,    y[0]],
+    [run2+(1035-994.04), 994.04, y[1]],
+    [arc2+A[1]/2,      735,    (y[1]+y[2])/2],
+    [run3+(796.79-770), 796.79, y[2]],
+    [arc3+A[2]/2,      1145,   (y[2]+y[3])/2],
+    [arc4+A[3]/2,      592.5,  (y[3]+y[4])/2],
+    [run5+(826.79-664), 826.79, y[4]],
+    [run5+(971.79-664), 971.79, y[4]]
+  ];
+}
+function layoutCover(){
+  if(coverBusy){ coverRelayout=true; return; }          /* never reshape the road while it is drawing */
+  var cover=document.getElementById('cover'), art=cover&&cover.querySelector('.cover-art');
+  var svg=document.getElementById('coverSvg'), road=document.getElementById('coverRoad'), arrow=document.getElementById('coverArrow');
+  if(!art||!svg||!road) return;
+  var w=window.innerWidth, Wa=art.clientWidth;
+  if(!Wa) return;                                        /* cover not on screen yet */
+  var H=420;
+  if(w>560 && w<=COVER_FIT_MAX_W){
+    var stage=cover.querySelector('.cover-stage'), cs=stage?getComputedStyle(stage):null;
+    var padV=cs?(parseFloat(cs.paddingTop)+parseFloat(cs.paddingBottom)):40;
+    var smin=parseFloat(document.documentElement.style.getPropertyValue('--screen-min'))||0;
+    var thumb=Math.min(84,Math.max(38,.07*Wa));          /* lowest icons overhang the art by half their height */
+    var Ha=Math.min(smin-padV-thumb-40, Wa*coverFitRatio(w));
+    if(Ha>Wa*420/1272*1.04) H=Math.round(1272*Ha/Wa);
+  }
+  if(H===420){ cover.style.removeProperty('--cover-ar'); } else { cover.style.setProperty('--cover-ar','1272 / '+H); }
+  if(+svg.getAttribute('data-h')===H) return;
+  svg.setAttribute('data-h',H);
+  svg.setAttribute('viewBox','0 0 1272 '+H);
+  road.setAttribute('d', H===420 ? COVER_D420 : coverRoadD(H));
+  if(arrow) arrow.setAttribute('d','M 1260,'+(H-10)+' L 1272,'+H+' L 1260,'+(H+10));
+  var N=(H===420?COVER_NODE420:coverNodes(H));
+  svg.querySelectorAll('.node').forEach(function(n,i){ if(N[i]){ n.setAttribute('cx',N[i][1]); n.setAttribute('cy',N[i][2]); } });
+  road.style.strokeDasharray=road.getTotalLength();
 }
 
 /* ── Cover animation ───────────────────────────────────────────
@@ -12219,8 +12264,7 @@ function animateCover(){
   var reduced = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
 
   var L = road.getTotalLength();
-  road.setAttribute('pathLength','1000');   /* dash maths independent of the curve's real length */
-  road.style.strokeDasharray  = 1000;
+  road.style.strokeDasharray  = L;
 
   /* distance along the road nearest each node; nodes are snapped onto the line so they never sit off it */
   function sAt(x,y){
@@ -12233,8 +12277,8 @@ function animateCover(){
   }
   /* Node positions along the road were measured once (same result as the old brute-force scan of
      the path, which blocked the main thread for seconds on phones). Fallback keeps the old scan. */
-  var NODE_PRE=[[880,880,0],[1154,994.04,53.22],[1437,735.55,93.84],[1522.5,796.79,134.21],
-                [1906,1144.99,193.44],[2544.5,593.29,337.09],[2828,826.79,420],[2973,971.79,420]];
+  var Hc=+document.getElementById('coverSvg').getAttribute('data-h')||420;
+  var NODE_PRE=(Hc===420)?COVER_NODE420:coverNodes(Hc);
   var nodeS = [];
   nodes.forEach(function(n,i){
     var pre = (nodes.length===NODE_PRE.length) ? NODE_PRE[i] : null;
@@ -12249,7 +12293,6 @@ function animateCover(){
     // Immediately show everything — no motion at all (also used where the
     // stacked mobile art is shown instead, which is static)
     road.style.strokeDashoffset = '0';
-    road.style.strokeDasharray  = 'none';
     arrow.style.opacity = '1';
     nodes.forEach(function(n){ n.style.opacity='1'; n.style.transform='scale(1)'; });
     thumbs.forEach(function(id){
@@ -12259,8 +12302,10 @@ function animateCover(){
     return;
   }
 
-  road.style.strokeDashoffset = 1000;
-  road.animate([{strokeDashoffset:1000},{strokeDashoffset:0}],
+  coverBusy=true;
+  setTimeout(function(){ coverBusy=false; if(coverRelayout){ coverRelayout=false; layoutCover(); } }, DRAW+1500);
+  road.style.strokeDashoffset = L;
+  road.animate([{strokeDashoffset:L},{strokeDashoffset:0}],
     {duration:DRAW,easing:'linear',fill:'forwards'});
   arrow.animate([{opacity:0},{opacity:1}],{duration:200,delay:DRAW-200,fill:'forwards'});
   nodes.forEach(function(n,i){
@@ -12553,59 +12598,15 @@ function sizeAccordion(){
 /* Every screen gets the height of the tallest one at this width, so the
    frame never changes height between cover, intro and events. Event text is
    measured in place (text swapped and restored synchronously; nothing paints). */
-/* Cover balance: the S-curve normally scales with the frame's WIDTH only, so when the frame is
-   tall and narrow (both Moodle side menus open) it ends up small with lots of white above and
-   below. Stretch the curve vertically so it fills about the same share of the frame height as on a
-   normal desktop (~66%). Same curve, same branding: only the gaps between the rows grow.
-   On a normal desktop the factor works out as 1, so nothing changes there. */
-/* The cover curve at height H. When the rows are pushed further apart the bends grow with them
-   (same proportions as the original, rx = 0.865 x ry), and each bend keeps its outermost point where it
-   was, so the bends stay smooth and round instead of turning into narrow pinched ovals. At H=420 this
-   is exactly the original path. */
-function coverPath(H){
-  var k=H/420, f=[0,46/363,116/363,220/363,1], y=f.map(function(v){return +(v*H).toFixed(2);});
-  var rx=[23*k,35*k,52*k,71.5*k].map(function(v){return +v.toFixed(2);});
-  var e1=+(1058-rx[0]).toFixed(2), e2=+(735+rx[1]).toFixed(2), e3=+(1145-rx[2]).toFixed(2), e4=+(592.5+rx[3]).toFixed(2);
-  return "M 0 "+y[0]+" H "+e1+" A "+rx[0]+" "+((y[1]-y[0])/2)+" 0 0 1 "+e1+" "+y[1]+
-         " H "+e2+" A "+rx[1]+" "+((y[2]-y[1])/2)+" 0 0 0 "+e2+" "+y[2]+
-         " H "+e3+" A "+rx[2]+" "+((y[3]-y[2])/2)+" 0 0 1 "+e3+" "+y[3]+
-         " H "+e4+" A "+rx[3]+" "+((y[4]-y[3])/2)+" 0 0 0 "+e4+" "+y[4]+" H 1272";
-}
-function fitCover(frameH){
-  var wrap=document.getElementById('coverArtWrap');
-  var svg=document.getElementById('coverSvg');
-  if(!wrap||!svg) return;
-  var artW=wrap.getBoundingClientRect().width;
-  if(artW<50) return;
-  var natural=artW*420/1272;
-  var k=(0.66*frameH)/natural;
-  k = k<1.04 ? 1 : Math.min(1.6, k);
-  var H=Math.round(420*k);
-  document.documentElement.style.setProperty('--cover-h', H);
-  svg.setAttribute('viewBox','0 0 1272 '+H);
-  document.getElementById('coverRoad').setAttribute('d', coverPath(H));
-  document.getElementById('coverArrow').setAttribute('d','M 1260,'+(H-10)+' L 1272,'+H+' L 1260,'+(H+10));
-  /* nodes follow the curve's new height, then are snapped exactly onto the line */
-  var road=document.getElementById('coverRoad'), L=road.getTotalLength();
-  svg.querySelectorAll('.node').forEach(function(n){
-    if(!n.hasAttribute('data-cy0')) n.setAttribute('data-cy0', n.getAttribute('cy'));
-    var x=+n.getAttribute('cx'), y=+n.getAttribute('data-cy0')*H/420, best=null, bd=1e18;
-    for(var s=0;s<=L;s+=0.5){
-      var q=road.getPointAtLength(s), d=(q.x-x)*(q.x-x)+(q.y-y)*(q.y-y);
-      if(d<bd){ bd=d; best=q; }
-    }
-    n.setAttribute('cx', best.x.toFixed(2)); n.setAttribute('cy', best.y.toFixed(2));
-  });
-}
 function fitScreens(){
   var root=document.documentElement;
   var w=window.innerWidth;
   if(w<=560){ root.style.setProperty('--screen-min','620px'); return; } /* phone: cover fills 620px; intro scrolls */
   var base = w<800 ? 620 : 578;
+  if(!coverBusy) document.getElementById('cover').style.removeProperty('--cover-ar');   /* measure the cover at its natural size */
   var els=['cover','intro','event'].map(function(id){return document.getElementById(id);});
   var was=els.map(function(el){return el.classList.contains('is-active');});
   /* measure with the same classes a real screen has (inactive screens lay out differently) */
-  root.style.setProperty('--cover-h', 420);   /* measure the cover at its natural size, then re-balance below */
   els.forEach(function(el){ el.classList.add('is-active'); el.style.minHeight='0'; });
   var max=Math.max(base, Math.ceil(els[0].getBoundingClientRect().height), Math.ceil(els[1].getBoundingClientRect().height));
   var ev=els[2], yr=document.getElementById('evYear'), ti=document.getElementById('evTitle'), de=document.getElementById('evDesc');
@@ -12615,9 +12616,9 @@ function fitScreens(){
     max=Math.max(max, Math.ceil(ev.getBoundingClientRect().height));
   });
   yr.textContent=oy; ti.textContent=ot; de.innerHTML=od;
-  fitCover(Math.ceil(max));
   els.forEach(function(el,i){ if(!was[i]) el.classList.remove('is-active'); el.style.minHeight=''; });
   root.style.setProperty('--screen-min', Math.ceil(max)+'px');
+  layoutCover();
 }
 var _fitTimer=null;
 window.addEventListener('resize', function(){ clearTimeout(_fitTimer); _fitTimer=setTimeout(fitScreens,120); });
