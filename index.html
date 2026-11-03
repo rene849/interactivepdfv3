@@ -47,11 +47,8 @@ body{overflow:visible;}
 /* height:100vh + overflow:hidden creates the stacking context for sticky */
 .screen.is-active{
   display:flex;flex-direction:column;overflow:hidden;
-  /* height:auto + min-height: screen sizes to its real content.
-     The cover art and intro S-curve use aspect-ratio so they scale
-     with container width — no vh feedback loop.
-     min-height ensures the timeline never floats too high on
-     narrow-but-tall viewports (e.g. tablet portrait).              */
+  /* Keep a shared minimum height across screens so the Moodle iframe
+     does not jump when learners move through the timeline. */
   height:auto;
   min-height:var(--screen-min,578px);
 }
@@ -106,6 +103,8 @@ body{overflow:visible;}
 
 /* ── COVER ── */
 #cover{overflow:hidden;}
+#cover .appbar-logo,
+#cover [data-ill="logo"]{display:none !important;}
 .cover-stage{
   position:relative;width:100%;max-width:var(--maxw);margin:0 auto;
   display:grid; /* text and art share one grid cell; the cell's height is
@@ -582,8 +581,11 @@ body{overflow:visible;}
 }
 /* 1100px and wider: same balanced title wrap (no orphaned word), including the capped 1216px desktop frame */
 @media(min-width:1100px){
-  #cover .cover-title{text-wrap:balance;}
-  #cover .cover-title br{display:none;}
+  #cover .cover-title{
+    font-size:clamp(34px,4.2vw,48px);
+    text-wrap:initial;
+  }
+  #cover .cover-title br{display:block;}
 }
 /* Phone frames: full width. The graphic spans the frame, title sits at the top
    and the Start button at the bottom. */
@@ -12293,7 +12295,7 @@ function layoutCover(){
   var cover=document.getElementById('cover'), art=cover&&cover.querySelector('.cover-art');
   var svg=document.getElementById('coverSvg'), road=document.getElementById('coverRoad'), arrow=document.getElementById('coverArrow');
   if(!art||!svg||!road) return;
-  var w=window.innerWidth, Wa=art.clientWidth;
+  var w=document.documentElement.clientWidth||window.innerWidth, Wa=art.clientWidth;
   if(!Wa) return;                                        /* cover not on screen yet */
   var H=420;
   if(w>560 && w<=COVER_FIT_MAX_W){
@@ -12706,7 +12708,7 @@ function applyEvCollapse(){
 document.getElementById('evMore').addEventListener('click',function(){ evExpanded=!evExpanded; applyEvCollapse(); });
 function fitScreens(){
   var root=document.documentElement;
-  var w=window.innerWidth;
+  var w=document.documentElement.clientWidth||window.innerWidth;
   if(w<=560){ root.style.setProperty('--screen-min','620px'); evCollapse={}; applyEvCollapse(); return; } /* phone: cover fills 620px; intro scrolls */
   var base = w<800 ? 620 : 578;
   if(!coverBusy) document.getElementById('cover').style.removeProperty('--cover-ar');   /* measure the cover at its natural size */
@@ -12753,8 +12755,27 @@ function fitScreens(){
   applyEvCollapse();
   layoutCover();
 }
-var _fitTimer=null;
-window.addEventListener('resize', function(){ clearTimeout(_fitTimer); _fitTimer=setTimeout(fitScreens,120); });
+var _fitTimer=null, _lastFitWidth=document.documentElement.clientWidth||window.innerWidth;
+function scheduleFit(){
+  clearTimeout(_fitTimer);
+  _fitTimer=setTimeout(function(){
+    var width=document.documentElement.clientWidth||window.innerWidth;
+    if(Math.abs(width-_lastFitWidth)>1){
+      _lastFitWidth=width;
+      fitScreens();
+    } else {
+      layoutCover();
+    }
+  },120);
+}
+window.addEventListener('resize', scheduleFit);
+if(window.ResizeObserver){
+  var _widthObserver=new ResizeObserver(function(){
+    var width=document.documentElement.clientWidth||window.innerWidth;
+    if(Math.abs(width-_lastFitWidth)>1) scheduleFit();
+  });
+  _widthObserver.observe(document.documentElement);
+}
 function toggleAcc(id){
   var items=document.querySelectorAll('#mobileTimeline .acc-item');
   items.forEach(function(it){
