@@ -12239,7 +12239,7 @@ function coverGeom(H){
 }
 function coverRoadD(H){
   var g=coverGeom(H), y=g.y, rx=g.rx, e=g.e;
-  function r(v){return (+v).toFixed(2);}
+  function r(v){return (+v).toFixed(4);}   /* 4 decimals: a bend's radius must match half its chord almost exactly */
   return 'M 0 0.00 H '+r(e[0])+' A '+r(rx[0])+' '+r((y[1]-y[0])/2)+' 0 0 1 '+r(e[0])+' '+r(y[1])+
          ' H '+r(e[1])+' A '+r(rx[1])+' '+r((y[2]-y[1])/2)+' 0 0 0 '+r(e[1])+' '+r(y[2])+
          ' H '+r(e[2])+' A '+r(rx[2])+' '+r((y[3]-y[2])/2)+' 0 0 1 '+r(e[2])+' '+r(y[3])+
@@ -12287,15 +12287,8 @@ function layoutCover(){
   if(arrow) arrow.setAttribute('d','M 1260,'+(H-10)+' L 1272,'+H+' L 1260,'+(H+10));
   var N=(H===420?COVER_NODE420:coverNodes(H));
   var RL=road.getTotalLength();
-  svg.querySelectorAll('.node').forEach(function(n,i){
-    if(!N[i]) return;
-    var x=N[i][1], y=N[i][2];
-    if(H!==420){   /* snap exactly onto the line */
-      var bd=1e18, bq=null;
-      for(var t=0;t<=RL;t+=1){ var q=road.getPointAtLength(t), d=(q.x-x)*(q.x-x)+(q.y-y)*(q.y-y); if(d<bd){bd=d;bq=q;} }
-      x=+bq.x.toFixed(2); y=+bq.y.toFixed(2);
-    }
-    n.setAttribute('cx',x); n.setAttribute('cy',y);
+  svg.querySelectorAll('.node').forEach(function(n,i){   /* positions are computed on the line itself, so no search is needed */
+    if(N[i]){ n.setAttribute('cx',N[i][1]); n.setAttribute('cy',N[i][2]); }
   });
   road.style.strokeDasharray=RL;
 }
@@ -12663,39 +12656,57 @@ function sizeAccordion(){
    room; FIT_MIN_ZOOM = never go smaller than this (keeps the text readable). Phones and the narrower
    "side menus open" widths are never scaled. */
 var FIT_RESERVE=262, FIT_MIN_ZOOM=0.92, FIT_MIN_WIDTH=1150;
-function applyFitZoom(frameH){
+function fitZoomFor(frameH){
   var z=1;
   if(window.innerWidth>=FIT_MIN_WIDTH && window.screen && screen.availHeight){
     var target=Math.max(460, screen.availHeight-FIT_RESERVE);
     z=Math.max(FIT_MIN_ZOOM, Math.min(1, target/(frameH+28)));
   }
-  z=Math.round(z*100)/100;
+  return Math.round(z*100)/100;
+}
+function applyFitZoom(frameH){
+  var z=fitZoomFor(frameH);
   document.body.style.zoom = z<1 ? z : '';
 }
 function fitScreens(){
   var root=document.documentElement;
   var w=window.innerWidth;
-  document.body.style.zoom='';                 /* always measure at 100%, then re-apply the fit below */
-  if(w<=560){ root.style.setProperty('--screen-min','620px'); return; } /* phone: cover fills 620px; intro scrolls */
+  if(w<=560){ document.body.style.zoom=''; root.style.setProperty('--screen-min','620px'); return; } /* phone: cover fills 620px; intro scrolls */
   var base = w<800 ? 620 : 578;
   if(!coverBusy) document.getElementById('cover').style.removeProperty('--cover-ar');   /* measure the cover at its natural size */
   var els=['cover','intro','event'].map(function(id){return document.getElementById(id);});
   var was=els.map(function(el){return el.classList.contains('is-active');});
-  /* measure with the same classes a real screen has (inactive screens lay out differently) */
-  els.forEach(function(el){ el.classList.add('is-active'); el.style.minHeight='0'; });
-  var max=Math.max(base, Math.ceil(els[0].getBoundingClientRect().height), Math.ceil(els[1].getBoundingClientRect().height));
   var ev=els[2], yr=document.getElementById('evYear'), ti=document.getElementById('evTitle'), de=document.getElementById('evDesc');
+  var wb=document.querySelector('#event .work-body'), wasLong=wb&&wb.classList.contains('long');
   var oy=yr.textContent, ot=ti.textContent, od=de.innerHTML;
-  MS.forEach(function(m){
-    yr.textContent=m.year; ti.textContent=m.title; setParas(de,m.desc);
-    max=Math.max(max, Math.ceil(ev.getBoundingClientRect().height));
-  });
+  /* Text wraps slightly differently at 92-100% zoom, so measure at the zoom that will be shown (offsetHeight is
+     in layout pixels, unaffected by zoom) and settle on it, instead of measuring at 100% and displaying at less:
+     that left the longest event (1972) about 48px taller than the frame on laptop-size screens. */
+  function measure(){
+    els.forEach(function(el){ el.classList.add('is-active'); el.style.minHeight='0'; });
+    var m=Math.max(base, els[0].offsetHeight+1, els[1].offsetHeight+1);
+    MS.forEach(function(x){
+      yr.textContent=x.year; ti.textContent=x.title; setParas(de,x.desc);
+      m=Math.max(m, ev.offsetHeight+1);
+    });
+    return m;
+  }
+  var z=1, max=0;
+  for(var pass=0; pass<3; pass++){
+    document.body.style.zoom = z<1 ? z : '';
+    max=Math.ceil(measure());
+    var zn=fitZoomFor(max);
+    if(Math.abs(zn-z)<0.005) break;
+    z=zn;
+  }
   yr.textContent=oy; ti.textContent=ot; de.innerHTML=od;
+  if(wb) wb.classList.toggle('long', !!wasLong);          /* setParas() flips this per event while measuring: put it back */
   els.forEach(function(el,i){ if(!was[i]) el.classList.remove('is-active'); el.style.minHeight=''; });
-  root.style.setProperty('--screen-min', Math.ceil(max)+'px');
-  applyFitZoom(Math.ceil(max));
+  root.style.setProperty('--screen-min', max+'px');
+  applyFitZoom(max);
   layoutCover();
 }
+
 var _fitTimer=null;
 window.addEventListener('resize', function(){ clearTimeout(_fitTimer); _fitTimer=setTimeout(fitScreens,120); });
 function toggleAcc(id){
