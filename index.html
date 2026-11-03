@@ -592,6 +592,34 @@ body{margin:8px !important;border-radius:8px;box-shadow:var(--mb-shadow-frame);p
  #eventOuter .work-body{padding-top:12px;padding-bottom:10px;}
  .ev-rule{margin:12px 0 12px;}
 }
+
+/* ── EVENT SLIDES: balanced text / image proportions ─────────────────────────────────────────
+   Text about 70% / image about 30% (the original is nearer 60/40 at this size), so the artwork is
+   large enough to hold the slide instead of sitting as a thin strip next to the text. The content
+   block is centred between the top bar and the timeline, the image is centred against the heading
+   + text block, and the tallest slide (1972) gets slightly tighter spacing so every slide can share
+   a shorter frame. Phone (≤560px) layout is untouched. */
+@media(min-width:561px){
+  .work-body{align-content:center;}
+  #eventOuter .ev-illo{align-self:center;}
+  .ev-rule{margin:11px 0 13px;}
+  #eventOuter .work-inner{padding-top:6px;padding-bottom:6px;}
+  #eventOuter .work-body{padding-top:8px;padding-bottom:8px;}
+}
+@media(min-width:1150px){
+  .work-body{grid-template-columns:minmax(0,1fr) clamp(280px,30%,400px);gap:clamp(28px,3.5vw,48px);}
+  .ev-illo-inner{max-width:400px;}
+}
+@media(min-width:800px) and (max-width:1149px){
+  .work-body{grid-template-columns:minmax(0,1fr) clamp(220px,32%,340px);gap:clamp(24px,3vw,36px);}
+  .ev-illo-inner{max-width:340px;}
+  .ev-desc{line-height:1.5;}
+}
+@media(min-width:561px) and (max-width:799px){
+  .work-body{grid-template-columns:minmax(0,1fr) clamp(170px,34%,270px);gap:22px;}
+  .ev-illo-inner{max-width:270px;}
+  .ev-desc{line-height:1.5;}
+}
 </style>
 </head>
 <body>
@@ -12193,28 +12221,38 @@ var COVER_NODE420=[[880,880,0],[1154,994.04,53.22],[1437,735.55,93.84],[1522.5,7
                    [1906,1144.99,193.44],[2544.5,593.29,337.09],[2828,826.79,420],[2973,971.79,420]]; /* [distance along road, cx, cy] */
 var coverBusy=false, coverRelayout=false;
 function ellHalf(rx,ry){var n=120,sum=0,dt=Math.PI/n;for(var i=0;i<n;i++){var t=(i+.5)*dt,a=rx*Math.sin(t),b=ry*Math.cos(t);sum+=Math.sqrt(a*a+b*b)*dt;}return sum;}
-function coverRoadD(H){
-  var y=COVER_F.map(function(f){return f*H;});
-  function r(v){return (+v).toFixed(2);}
-  return 'M 0 0.00 H 1035 A 23 '+r((y[1]-y[0])/2)+' 0 0 1 1035 '+r(y[1])+
-         ' H 770 A 35 '+r((y[2]-y[1])/2)+' 0 0 0 770 '+r(y[2])+
-         ' H 1093 A 52 '+r((y[3]-y[2])/2)+' 0 0 1 1093 '+r(y[3])+
-         ' H 664 A 71.5 '+r((y[4]-y[3])/2)+' 0 0 0 664 '+r(y[4])+' H 1272';
+/* Cover road for a frame that needs a taller curve. The bends grow with the rows (rx stays 0.865 x ry, as in
+   the original artwork) and every bend keeps its outermost point where it was, so the curve stays smooth and
+   round at any height instead of squeezing into narrow, pinched ovals. At H=420 this is the original path. */
+function coverGeom(H){
+  var k=H/420, y=COVER_F.map(function(f){return f*H;});
+  var rx=[23,35,52,71.5].map(function(v){return v*k;});
+  return {y:y, rx:rx, e:[1058-rx[0], 735+rx[1], 1145-rx[2], 592.5+rx[3]]};
 }
-/* [distance along road, cx, cy] of each node for a road of height H */
+function coverRoadD(H){
+  var g=coverGeom(H), y=g.y, rx=g.rx, e=g.e;
+  function r(v){return (+v).toFixed(2);}
+  return 'M 0 0.00 H '+r(e[0])+' A '+r(rx[0])+' '+r((y[1]-y[0])/2)+' 0 0 1 '+r(e[0])+' '+r(y[1])+
+         ' H '+r(e[1])+' A '+r(rx[1])+' '+r((y[2]-y[1])/2)+' 0 0 0 '+r(e[1])+' '+r(y[2])+
+         ' H '+r(e[2])+' A '+r(rx[2])+' '+r((y[3]-y[2])/2)+' 0 0 1 '+r(e[2])+' '+r(y[3])+
+         ' H '+r(e[3])+' A '+r(rx[3])+' '+r((y[4]-y[3])/2)+' 0 0 0 '+r(e[3])+' '+r(y[4])+' H 1272';
+}
+/* [distance along road, cx, cy] of each node for a road of height H (always exactly on the line) */
 function coverNodes(H){
-  var y=COVER_F.map(function(f){return f*H;});
-  var A=[ellHalf(23,(y[1]-y[0])/2),ellHalf(35,(y[2]-y[1])/2),ellHalf(52,(y[3]-y[2])/2),ellHalf(71.5,(y[4]-y[3])/2)];
-  var run2=1035+A[0], arc2=run2+265, run3=arc2+A[1], arc3=run3+323, run4=arc3+A[2], arc4=run4+429, run5=arc4+A[3];
+  var g=coverGeom(H), y=g.y, rx=g.rx, e=g.e;
+  var A=[0,1,2,3].map(function(i){return ellHalf(rx[i],(y[i+1]-y[i])/2);});
+  var s2=e[0]+A[0], s3=s2+(e[0]-e[1]), s4=s3+A[1], s5=s4+(e[2]-e[1]), s6=s5+A[2], s7=s6+(e[2]-e[3]), s8=s7+A[3];
+  function cl(x,lo,hi){return Math.max(lo,Math.min(hi,x));}
+  var x2=cl(994.04,e[1]+4,e[0]-4), x4=cl(796.79,e[1]+4,e[2]-4), x7=cl(826.79,e[3]+4,1268), x8=cl(971.79,x7+20,1268);
   return [
-    [880,              880,    y[0]],
-    [run2+(1035-994.04), 994.04, y[1]],
-    [arc2+A[1]/2,      735,    (y[1]+y[2])/2],
-    [run3+(796.79-770), 796.79, y[2]],
-    [arc3+A[2]/2,      1145,   (y[2]+y[3])/2],
-    [arc4+A[3]/2,      592.5,  (y[3]+y[4])/2],
-    [run5+(826.79-664), 826.79, y[4]],
-    [run5+(971.79-664), 971.79, y[4]]
+    [880,                880, y[0]],
+    [s2+(e[0]-x2),       x2,  y[1]],
+    [s3+A[1]/2,          735, (y[1]+y[2])/2],
+    [s4+(x4-e[1]),       x4,  y[2]],
+    [s5+A[2]/2,          1145,(y[2]+y[3])/2],
+    [s7+A[3]/2,          592.5,(y[3]+y[4])/2],
+    [s8+(x7-e[3]),       x7,  y[4]],
+    [s8+(x8-e[3]),       x8,  y[4]]
   ];
 }
 function layoutCover(){
@@ -12231,7 +12269,7 @@ function layoutCover(){
     var smin=parseFloat(document.documentElement.style.getPropertyValue('--screen-min'))||0;
     var thumb=Math.min(84,Math.max(38,.07*Wa));          /* lowest icons overhang the art by half their height */
     var Ha=Math.min(smin-padV-thumb-40, Wa*coverFitRatio(w));
-    if(Ha>Wa*420/1272*1.04) H=Math.round(1272*Ha/Wa);
+    if(Ha>Wa*420/1272*1.04) H=Math.min(756, Math.round(1272*Ha/Wa));   /* never stretch past 1.8x so the bends stay round */
   }
   if(H===420){ cover.style.removeProperty('--cover-ar'); } else { cover.style.setProperty('--cover-ar','1272 / '+H); }
   if(+svg.getAttribute('data-h')===H) return;
@@ -12240,8 +12278,18 @@ function layoutCover(){
   road.setAttribute('d', H===420 ? COVER_D420 : coverRoadD(H));
   if(arrow) arrow.setAttribute('d','M 1260,'+(H-10)+' L 1272,'+H+' L 1260,'+(H+10));
   var N=(H===420?COVER_NODE420:coverNodes(H));
-  svg.querySelectorAll('.node').forEach(function(n,i){ if(N[i]){ n.setAttribute('cx',N[i][1]); n.setAttribute('cy',N[i][2]); } });
-  road.style.strokeDasharray=road.getTotalLength();
+  var RL=road.getTotalLength();
+  svg.querySelectorAll('.node').forEach(function(n,i){
+    if(!N[i]) return;
+    var x=N[i][1], y=N[i][2];
+    if(H!==420){   /* snap exactly onto the line */
+      var bd=1e18, bq=null;
+      for(var t=0;t<=RL;t+=1){ var q=road.getPointAtLength(t), d=(q.x-x)*(q.x-x)+(q.y-y)*(q.y-y); if(d<bd){bd=d;bq=q;} }
+      x=+bq.x.toFixed(2); y=+bq.y.toFixed(2);
+    }
+    n.setAttribute('cx',x); n.setAttribute('cy',y);
+  });
+  road.style.strokeDasharray=RL;
 }
 
 /* ── Cover animation ───────────────────────────────────────────
@@ -12598,9 +12646,26 @@ function sizeAccordion(){
 /* Every screen gets the height of the tallest one at this width, so the
    frame never changes height between cover, intro and events. Event text is
    measured in place (text swapped and restored synchronously; nothing paints). */
+/* Fit-to-screen (side menus closed): the frame's height comes from its content (the tallest slide), so on
+   a wide frame it can be taller than the browser window shows below Moodle's header. The page already tells
+   Moodle its height, so we scale the whole frame down just enough to sit inside the visible space.
+   FIT_RESERVE = vertical pixels of a typical screen taken by the browser bar, the Moodle header and breathing
+   room; FIT_MIN_ZOOM = never go smaller than this (keeps the text readable). Phones and the narrower
+   "side menus open" widths are never scaled. */
+var FIT_RESERVE=292, FIT_MIN_ZOOM=0.84, FIT_MIN_WIDTH=1150;
+function applyFitZoom(frameH){
+  var z=1;
+  if(window.innerWidth>=FIT_MIN_WIDTH && window.screen && screen.availHeight){
+    var target=Math.max(460, screen.availHeight-FIT_RESERVE);
+    z=Math.max(FIT_MIN_ZOOM, Math.min(1, target/(frameH+28)));
+  }
+  z=Math.round(z*100)/100;
+  document.body.style.zoom = z<1 ? z : '';
+}
 function fitScreens(){
   var root=document.documentElement;
   var w=window.innerWidth;
+  document.body.style.zoom='';                 /* always measure at 100%, then re-apply the fit below */
   if(w<=560){ root.style.setProperty('--screen-min','620px'); return; } /* phone: cover fills 620px; intro scrolls */
   var base = w<800 ? 620 : 578;
   if(!coverBusy) document.getElementById('cover').style.removeProperty('--cover-ar');   /* measure the cover at its natural size */
@@ -12618,6 +12683,7 @@ function fitScreens(){
   yr.textContent=oy; ti.textContent=ot; de.innerHTML=od;
   els.forEach(function(el,i){ if(!was[i]) el.classList.remove('is-active'); el.style.minHeight=''; });
   root.style.setProperty('--screen-min', Math.ceil(max)+'px');
+  applyFitZoom(Math.ceil(max));
   layoutCover();
 }
 var _fitTimer=null;
@@ -12870,7 +12936,7 @@ document.addEventListener('keydown',function(e){
   }
   function _report(force){
     /* +28px: 8px top margin and 20px bottom room for the drop shadow */
-    var h = Math.ceil(document.body.getBoundingClientRect().height) + 28;
+    var h = Math.ceil(document.body.offsetHeight * (parseFloat(document.body.style.zoom)||1)) + 28;
     if (force !== true && Math.abs(h - lastSent) <= 2) return;
     lastSent = h;
     window.parent.postMessage({ type:'resize', app:'ce-interactive', height:h }, '*');
