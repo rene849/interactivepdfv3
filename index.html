@@ -242,6 +242,16 @@ body{overflow:visible;}
 .ev-desc{font-size:15px;line-height:1.6;color:var(--ink);}
 .ev-desc p,.acc-desc p{margin:0 0 .6em;}
 .ev-desc p:last-child,.acc-desc p:last-child{margin-bottom:0;}
+/* Long events: the text is trimmed to fit the frame, with a "Read more" toggle. The full text stays in the
+   page (screen readers still get all of it); only its visible height is limited. */
+.ev-desc.is-clamped{overflow:hidden;-webkit-mask-image:linear-gradient(#000 calc(100% - 2.6em),transparent);mask-image:linear-gradient(#000 calc(100% - 2.6em),transparent);}
+.ev-desc.is-clamped.no-fade{-webkit-mask-image:none;mask-image:none;}
+.ev-more{display:inline-flex;align-items:center;gap:8px;margin-top:6px;padding:0 2px;min-height:44px;background:none;border:0;border-radius:4px;color:var(--blue);font:inherit;font-size:15px;font-weight:700;cursor:pointer;}
+.ev-more[hidden]{display:none;}
+.ev-more:hover{color:var(--navy);text-decoration:underline;}
+.ev-more svg{width:12px;height:8px;transition:transform .15s;}
+.ev-more[aria-expanded="true"] svg{transform:rotate(180deg);}
+@media(prefers-reduced-motion:reduce){.ev-more svg{transition:none;}}
 
 .ev-illo{display:flex;justify-content:center;align-items:center;
   align-self:center; /* vertically centre the artwork in the space between the header rule and the timeline */}
@@ -557,8 +567,21 @@ body{overflow:visible;}
   #cover .cover-title br{display:none;}
   #cover .btn-start{min-width:152px;}
 }
-/* one-menu widths: same balanced title wrap (no orphaned word) */
-@media(min-width:1100px) and (max-width:1399px){
+/* Narrow tablet-type frames (561–680px): the phone-style stacked cover, drawn larger.
+   A wide animated curve is too small and a tall one too thin here; the stacked art is the right shape. */
+@media(min-width:561px) and (max-width:680px){
+  #cover .cover-art{display:none;}
+  #cover .cover-stage{display:flex;flex-direction:column;justify-content:center;flex:1;width:100%;max-width:none;padding:28px 28px 32px;}
+  #cover .cover-text{display:flex;flex-direction:column;flex:none;max-width:none;align-self:stretch;}
+  #cover .cover-title{font-size:clamp(30px,6.4vw,40px);max-width:9em;margin:0 0 28px;text-wrap:balance;}
+  #cover .cover-title br{display:none;}
+  #cover .cover-art-mobile{display:block;width:100%;max-width:440px;aspect-ratio:256/230;margin:0 auto 40px;position:relative;}
+  #cover .cover-art-mobile .cover-path{width:100%;height:auto;display:block;overflow:visible;}
+  #cover .cover-art-mobile .thumb{aspect-ratio:1/1;height:auto;opacity:1;transform:translate(-50%,-50%) scale(1);transition:none;}
+  #cover .btn-start{width:100%;max-width:440px;align-self:center;height:47px;}
+}
+/* 1100px and wider: same balanced title wrap (no orphaned word), including the capped 1216px desktop frame */
+@media(min-width:1100px){
   #cover .cover-title{text-wrap:balance;}
   #cover .cover-title br{display:none;}
 }
@@ -12009,6 +12032,7 @@ body{max-width:var(--frame-max,1216px);margin:8px auto !important;}
           </div>
           <div class="ev-rule" aria-hidden="true"></div>
           <div class="ev-desc" id="evDesc"></div>
+          <button type="button" class="ev-more" id="evMore" aria-expanded="false" aria-controls="evDesc" hidden><span id="evMoreLabel">Read more</span><svg viewBox="0 0 12 8" aria-hidden="true" focusable="false"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </div>
         <div class="ev-illo fade" id="evIllo" aria-hidden="true">
           <div class="ev-illo-inner" id="evIlloInner"></div>
@@ -12194,8 +12218,9 @@ function sizeIlloToAsset(containerId, assetName){
 }
 
 /* ── Screen management ───────────────────────────────────────── */
-var screens = ['cover','intro','event'];
+var screens = ['cover','intro','event'], _lastScreen = 'cover';
 function show(id){
+  if(id!==_lastScreen){ _lastScreen=id; try{ window.parent.postMessage({type:'ce-top',app:'ce-interactive'},'*'); }catch(e){} }
   screens.forEach(function(s){
     document.getElementById(s).classList.toggle('is-active', s===id);
   });
@@ -12649,64 +12674,85 @@ function sizeAccordion(){
 /* Every screen gets the height of the tallest one at this width, so the
    frame never changes height between cover, intro and events. Event text is
    measured in place (text swapped and restored synchronously; nothing paints). */
-/* Fit-to-screen (side menus closed): the frame's height comes from its content (the tallest slide), so on
-   a wide frame it can be taller than the browser window shows below Moodle's header. The page already tells
-   Moodle its height, so we scale the whole frame down just enough to sit inside the visible space.
-   FIT_RESERVE = vertical pixels of a typical screen taken by the browser bar, the Moodle header and breathing
-   room; FIT_MIN_ZOOM = never go smaller than this (keeps the text readable). Phones and the narrower
-   "side menus open" widths are never scaled. */
-var FIT_RESERVE=262, FIT_MIN_ZOOM=0.92, FIT_MIN_WIDTH=1150;
-function fitZoomFor(frameH){
-  var z=1;
-  if(window.innerWidth>=FIT_MIN_WIDTH && window.screen && screen.availHeight){
-    var target=Math.max(460, screen.availHeight-FIT_RESERVE);
-    z=Math.max(FIT_MIN_ZOOM, Math.min(1, target/(frameH+28)));
-  }
-  return Math.round(z*100)/100;
+/* ── Frame height budget + long-text handling ──────────────────
+   usableH(): how much height is realistically visible. The Moodle snippet can send the real value
+   ({type:'ce-viewport', app:'ce-interactive', height}); without it a safe estimate from the screen
+   size is used. The three or four longest events are trimmed with "Read more" so that one long
+   event no longer sets the height of every screen. */
+var CE_VP=null, evCollapse={}, evSnap={}, evExpanded=false;
+function usableH(){
+  if(CE_VP) return CE_VP;
+  var sh=(window.screen&&screen.availHeight)||900;
+  return Math.max(520,Math.min(780,sh-260));
 }
-function applyFitZoom(frameH){
-  var z=fitZoomFor(frameH);
-  document.body.style.zoom = z<1 ? z : '';
+window.addEventListener('message',function(e){
+  var d=e.data;
+  if(e.source!==window.parent||!d||typeof d!=='object'||d.type!=='ce-viewport'||d.app!=='ce-interactive'||typeof d.height!=='number') return;
+  var v=Math.max(320,Math.min(2400,Math.round(d.height)));
+  if(Math.abs(v-(CE_VP||0))<8) return;
+  CE_VP=v; clearTimeout(_fitTimer); _fitTimer=setTimeout(fitScreens,120);
+});
+function applyEvCollapse(){
+  var de=document.getElementById('evDesc'), btn=document.getElementById('evMore'), lab=document.getElementById('evMoreLabel');
+  if(!de||!btn) return;
+  var px=(window.innerWidth>560)?evCollapse[currentId]:0;
+  if(!px){ de.classList.remove('is-clamped'); de.style.maxHeight=''; btn.hidden=true; evExpanded=false; return; }
+  btn.hidden=false;
+  var m=MS.find(function(x){return x.id===currentId;});
+  if(evExpanded){ de.classList.remove('is-clamped'); de.style.maxHeight=''; lab.textContent='Show less'; btn.setAttribute('aria-expanded','true'); }
+  else { de.classList.add('is-clamped'); de.classList.toggle('no-fade',!!evSnap[currentId]); de.style.maxHeight=px+'px'; lab.textContent='Read more'; btn.setAttribute('aria-expanded','false'); }
+  btn.setAttribute('aria-label',(evExpanded?'Show less: ':'Read more: ')+(m?m.title:''));
 }
+document.getElementById('evMore').addEventListener('click',function(){ evExpanded=!evExpanded; applyEvCollapse(); });
 function fitScreens(){
   var root=document.documentElement;
   var w=window.innerWidth;
-  if(w<=560){ document.body.style.zoom=''; root.style.setProperty('--screen-min','620px'); return; } /* phone: cover fills 620px; intro scrolls */
+  if(w<=560){ root.style.setProperty('--screen-min','620px'); evCollapse={}; applyEvCollapse(); return; } /* phone: cover fills 620px; intro scrolls */
   var base = w<800 ? 620 : 578;
   if(!coverBusy) document.getElementById('cover').style.removeProperty('--cover-ar');   /* measure the cover at its natural size */
   var els=['cover','intro','event'].map(function(id){return document.getElementById(id);});
   var was=els.map(function(el){return el.classList.contains('is-active');});
-  var ev=els[2], yr=document.getElementById('evYear'), ti=document.getElementById('evTitle'), de=document.getElementById('evDesc');
-  var wb=document.querySelector('#event .work-body'), wasLong=wb&&wb.classList.contains('long');
+  /* measure with the same classes a real screen has (inactive screens lay out differently) */
+  els.forEach(function(el){ el.classList.add('is-active'); el.style.minHeight='0'; });
+  var max=Math.max(base, Math.ceil(els[0].getBoundingClientRect().height), Math.ceil(els[1].getBoundingClientRect().height));
+  var ev=els[2], yr=document.getElementById('evYear'), ti=document.getElementById('evTitle'), de=document.getElementById('evDesc'), btn=document.getElementById('evMore');
   var oy=yr.textContent, ot=ti.textContent, od=de.innerHTML;
-  /* Text wraps slightly differently at 92-100% zoom, so measure at the zoom that will be shown (offsetHeight is
-     in layout pixels, unaffected by zoom) and settle on it, instead of measuring at 100% and displaying at less:
-     that left the longest event (1972) about 48px taller than the frame on laptop-size screens. */
-  function measure(){
-    els.forEach(function(el){ el.classList.add('is-active'); el.style.minHeight='0'; });
-    var m=Math.max(base, els[0].offsetHeight+1, els[1].offsetHeight+1);
-    MS.forEach(function(x){
-      yr.textContent=x.year; ti.textContent=x.title; setParas(de,x.desc);
-      m=Math.max(m, ev.offsetHeight+1);
-    });
-    return m;
-  }
-  var z=1, max=0;
-  for(var pass=0; pass<3; pass++){
-    document.body.style.zoom = z<1 ? z : '';
-    max=Math.ceil(measure());
-    var zn=fitZoomFor(max);
-    if(Math.abs(zn-z)<0.005) break;
-    z=zn;
-  }
+  var wb=document.querySelector('#event .work-body'), wasLong=wb&&wb.classList.contains('long');   /* setParas() flips this per event while measuring */
+  var oc=de.classList.contains('is-clamped'), om=de.style.maxHeight, oh=btn.hidden;
+  de.classList.remove('is-clamped'); de.style.maxHeight=''; btn.hidden=true;
+  /* 1. natural height of every event */
+  var nat=MS.map(function(m){
+    yr.textContent=m.year; ti.textContent=m.title; setParas(de,m.desc);
+    return Math.ceil(ev.getBoundingClientRect().height);
+  });
+  /* 2. frame budget: the 4th-longest event, kept within what the viewport can show */
+  var sorted=nat.slice().sort(function(a,b){return b-a;});
+  var Ht=Math.min(Math.max(540,sorted[3]), Math.max(520,usableH()));
+  var lineH=parseFloat(getComputedStyle(de).lineHeight)||26;
+  evCollapse={}; evSnap={};
+  MS.forEach(function(m,i){
+    if(nat[i]<=Ht+80){ max=Math.max(max,nat[i]); return; }          /* fits (or only just over): shown in full */
+    yr.textContent=m.year; ti.textContent=m.title; setParas(de,m.desc);
+    var full=de.getBoundingClientRect().height, lo=4, hi=Math.max(4,Math.floor(full/lineH)), best=lo, hAt;
+    btn.hidden=false; de.classList.add('is-clamped');
+    function measure(n){ de.style.maxHeight=(n*lineH)+'px'; return Math.ceil(ev.getBoundingClientRect().height); }
+    while(lo<=hi){ var mid=(lo+hi)>>1; if(measure(mid)<=Ht){ best=mid; lo=mid+1; } else { hi=mid-1; } }
+    /* prefer ending on a paragraph boundary (no fade needed) when at least 4 lines still show */
+    var cut=best*lineH, snap=0, ps=de.children, top0=de.getBoundingClientRect().top;
+    for(var q=0;q<ps.length;q++){ var bt=Math.ceil(ps[q].getBoundingClientRect().bottom-top0); if(bt<=cut+6 && bt>=4*lineH) snap=bt; }
+    if(snap && snap<full-4){ cut=snap; } else { snap=0; }
+    de.style.maxHeight=cut+'px'; hAt=Math.ceil(ev.getBoundingClientRect().height);
+    evCollapse[m.id]=cut; evSnap[m.id]=!!snap; max=Math.max(max,hAt);
+    de.classList.remove('is-clamped'); de.style.maxHeight=''; btn.hidden=true;
+  });
   yr.textContent=oy; ti.textContent=ot; de.innerHTML=od;
-  if(wb) wb.classList.toggle('long', !!wasLong);          /* setParas() flips this per event while measuring: put it back */
+  if(wb) wb.classList.toggle('long', !!wasLong);
+  if(oc) de.classList.add('is-clamped'); de.style.maxHeight=om; btn.hidden=oh;
   els.forEach(function(el,i){ if(!was[i]) el.classList.remove('is-active'); el.style.minHeight=''; });
-  root.style.setProperty('--screen-min', max+'px');
-  applyFitZoom(max);
+  root.style.setProperty('--screen-min', Math.ceil(max)+'px');
+  applyEvCollapse();
   layoutCover();
 }
-
 var _fitTimer=null;
 window.addEventListener('resize', function(){ clearTimeout(_fitTimer); _fitTimer=setTimeout(fitScreens,120); });
 function toggleAcc(id){
@@ -12787,6 +12833,7 @@ function selectEvent(id){
     document.getElementById('evYear').textContent=m.year;
     document.getElementById('evTitle').textContent=m.title;
     setParas(document.getElementById('evDesc'),m.desc);
+    evExpanded=false; applyEvCollapse();
     injectClear('evIlloInner', m.asset);       // FIX: clear before inject
     sizeIlloToAsset('evIlloInner', m.asset);
     evText.style.opacity='1'; evIllo.style.opacity='1';
@@ -12957,7 +13004,7 @@ document.addEventListener('keydown',function(e){
   }
   function _report(force){
     /* +28px: 8px top margin and 20px bottom room for the drop shadow */
-    var h = Math.ceil(document.body.offsetHeight * (parseFloat(document.body.style.zoom)||1)) + 28;
+    var h = Math.ceil(document.body.getBoundingClientRect().height) + 28;
     if (force !== true && Math.abs(h - lastSent) <= 2) return;
     lastSent = h;
     window.parent.postMessage({ type:'resize', app:'ce-interactive', height:h }, '*');
@@ -12965,6 +13012,9 @@ document.addEventListener('keydown',function(e){
   /* Re-send during start-up (fonts, injected SVGs, and a parent page whose
      listener may attach after this frame has already posted its first size). */
   [150,500,1200,2500,5000].forEach(function(t){ setTimeout(function(){ _report(true); }, t); });
+  /* ask the parent for the visible viewport height (see the Moodle snippet) */
+  function hello(){ try{ window.parent.postMessage({type:'ce-ready',app:'ce-interactive'},'*'); }catch(e){} }
+  hello(); setTimeout(hello,600); setTimeout(hello,2500); window.addEventListener('pageshow',hello);
   window.addEventListener('pageshow', function(){ _report(true); });
   document.addEventListener('visibilitychange', function(){ if(!document.hidden) _report(true); });
   window.addEventListener('message', function(e){
