@@ -648,7 +648,8 @@ body{margin:8px !important;border-radius:8px;box-shadow:var(--mb-shadow-frame);p
 }
 
 /* ── FRAME WIDTH: sized to the content, as in the original (~1216px frame) rather than stretching across a wide Moodle page ── */
-body{max-width:var(--frame-max,1216px);margin:8px auto !important;}
+/* min() keeps an 8px gutter either side at every width, so the frame's drop shadow is never cut off by the iframe edge */
+body{max-width:min(var(--frame-max,1216px), calc(100% - 16px));margin:8px auto !important;}
 /* long descriptions: 75% text / 25% image */
 @media(min-width:1150px){.work-body.long{grid-template-columns:minmax(0,1fr) clamp(240px,25%,330px);}.work-body.long .ev-illo-inner{max-width:330px;}}
 @media(min-width:800px) and (max-width:1149px){.work-body.long{grid-template-columns:minmax(0,1fr) clamp(200px,26%,290px);}}
