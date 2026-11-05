@@ -566,6 +566,8 @@ body{overflow:visible;}
   #cover .cover-title br{display:none;}
   #cover .btn-start{min-width:152px;}
 }
+/* Intro curve: when the visible area is short its height is capped (right-aligned, scaled uniformly) */
+@media(min-width:561px){.intro-bg{max-width:calc(var(--intro-art-h,9999px) * 1284 / 392);justify-self:end;}}
 /* Narrow tablet-type frames (561–680px): the phone-style stacked cover, drawn larger.
    A wide animated curve is too small and a tall one too thin here; the stacked art is the right shape. */
 @media(min-width:561px) and (max-width:680px){
@@ -12685,8 +12687,8 @@ function sizeAccordion(){
 var CE_VP=null, evCollapse={}, evSnap={}, evExpanded=false;
 function usableH(){
   if(CE_VP) return CE_VP;
-  var sh=(window.screen&&screen.availHeight)||900;
-  return Math.max(520,Math.min(780,sh-260));
+  var sh=(window.screen&&screen.availHeight)||900;      /* browser bar + Moodle header + breathing room ~ 280px */
+  return Math.max(520,Math.min(780,sh-280));
 }
 window.addEventListener('message',function(e){
   var d=e.data;
@@ -12712,12 +12714,20 @@ function fitScreens(){
   var w=document.documentElement.clientWidth||window.innerWidth;
   if(w<=560){ root.style.setProperty('--screen-min','620px'); evCollapse={}; applyEvCollapse(); return; } /* phone: cover fills 620px; intro scrolls */
   var base = w<800 ? 620 : 578;
+  var cap = Math.max(480, usableH()-48);        /* tallest screen that still fits the visible area */
+  base = Math.min(base, cap);
   if(!coverBusy) document.getElementById('cover').style.removeProperty('--cover-ar');   /* measure the cover at its natural size */
   var els=['cover','intro','event'].map(function(id){return document.getElementById(id);});
   var was=els.map(function(el){return el.classList.contains('is-active');});
   /* measure with the same classes a real screen has (inactive screens lay out differently) */
   els.forEach(function(el){ el.classList.add('is-active'); el.style.minHeight='0'; });
-  var max=Math.max(base, Math.ceil(els[0].getBoundingClientRect().height), Math.ceil(els[1].getBoundingClientRect().height));
+  root.style.removeProperty('--intro-art-h');
+  var introNat=Math.ceil(els[1].getBoundingClientRect().height), introArt=document.querySelector('#intro .intro-bg');
+  if(introNat>cap && introArt && introArt.offsetHeight>0){          /* shrink the curve by exactly the excess (never below 220px) */
+    root.style.setProperty('--intro-art-h', Math.max(220, introArt.offsetHeight-(introNat-cap))+'px');
+    introNat=Math.ceil(els[1].getBoundingClientRect().height);
+  }
+  var max=Math.max(base, Math.ceil(els[0].getBoundingClientRect().height), introNat);
   var ev=els[2], yr=document.getElementById('evYear'), ti=document.getElementById('evTitle'), de=document.getElementById('evDesc'), btn=document.getElementById('evMore');
   var oy=yr.textContent, ot=ti.textContent, od=de.innerHTML;
   var wb=document.querySelector('#event .work-body'), wasLong=wb&&wb.classList.contains('long');   /* setParas() flips this per event while measuring */
@@ -12730,11 +12740,11 @@ function fitScreens(){
   });
   /* 2. frame budget: the 4th-longest event, kept within what the viewport can show */
   var sorted=nat.slice().sort(function(a,b){return b-a;});
-  var Ht=Math.min(Math.max(540,sorted[3]), Math.max(520,usableH()));
+  var Ht=Math.min(Math.max(540,sorted[3]), cap), slack=(Ht>=cap)?24:80;   /* when the visible area is the limit, trim even small overflows */
   var lineH=parseFloat(getComputedStyle(de).lineHeight)||26;
   evCollapse={}; evSnap={};
   MS.forEach(function(m,i){
-    if(nat[i]<=Ht+80){ max=Math.max(max,nat[i]); return; }          /* fits (or only just over): shown in full */
+    if(nat[i]<=Ht+slack){ max=Math.max(max,nat[i]); return; }          /* fits (or only just over): shown in full */
     yr.textContent=m.year; ti.textContent=m.title; setParas(de,m.desc);
     var full=de.getBoundingClientRect().height, lo=4, hi=Math.max(4,Math.floor(full/lineH)), best=lo, hAt;
     btn.hidden=false; de.classList.add('is-clamped');
@@ -12745,6 +12755,9 @@ function fitScreens(){
     for(var q=0;q<ps.length;q++){ var bt=Math.ceil(ps[q].getBoundingClientRect().bottom-top0); if(bt<=cut+6 && bt>=4*lineH) snap=bt; }
     if(snap && snap<full-4){ cut=snap; } else { snap=0; }
     de.style.maxHeight=cut+'px'; hAt=Math.ceil(ev.getBoundingClientRect().height);
+    if(nat[i]-hAt<40){                                              /* saves under ~2 lines: not worth hiding any text */
+      de.classList.remove('is-clamped'); de.style.maxHeight=''; btn.hidden=true; max=Math.max(max,nat[i]); return;
+    }
     evCollapse[m.id]=cut; evSnap[m.id]=!!snap; max=Math.max(max,hAt);
     de.classList.remove('is-clamped'); de.style.maxHeight=''; btn.hidden=true;
   });
