@@ -156,7 +156,7 @@ body{overflow:visible;}
 /* Cover floating thumbnails */
 .thumb{
   position:absolute;
-  width:clamp(38px,7%,84px);aspect-ratio:1/1;height:auto;
+  width:clamp(38px,7%,260px);aspect-ratio:1/1;height:auto;
   transform:translate(-50%,-50%) scale(.6);opacity:0;
   transition:opacity .25s ease,transform .25s cubic-bezier(.16,1,.3,1);
   pointer-events:none;z-index:10;
@@ -245,9 +245,13 @@ body{overflow:visible;}
    page (screen readers still get all of it); only its visible height is limited. */
 .ev-desc.is-clamped{overflow:hidden;-webkit-mask-image:linear-gradient(#000 calc(100% - 2.6em),transparent);mask-image:linear-gradient(#000 calc(100% - 2.6em),transparent);}
 .ev-desc.is-clamped.no-fade{-webkit-mask-image:none;mask-image:none;}
-.ev-more{display:inline-flex;align-items:center;gap:8px;margin-top:6px;padding:0 2px;min-height:44px;background:none;border:0;border-radius:4px;color:var(--blue);font:inherit;font-size:15px;font-weight:700;cursor:pointer;}
+/* "Read more" is a proper button: same 4px corners as Start, blue outline and text like the timeline numbers */
+.ev-more{display:inline-flex;align-self:flex-start;justify-self:start;width:fit-content;align-items:center;gap:10px;margin-top:14px;padding:0 18px;min-height:44px;background:#fff;
+  border:1.5px solid var(--blue);border-radius:4px;color:var(--blue);font:inherit;font-size:15px;font-weight:700;cursor:pointer;
+  transition:background .1s,border-color .1s;}
 .ev-more[hidden]{display:none;}
-.ev-more:hover{color:var(--navy);text-decoration:underline;}
+.ev-more:hover,.ev-more:focus-visible{background:#e6eaee;}
+.ev-more:active{background:#fff;border-color:var(--teal);border-width:2px;padding:0 17.5px;}
 .ev-more svg{width:12px;height:8px;transition:transform .15s;}
 .ev-more[aria-expanded="true"] svg{transform:rotate(180deg);}
 @media(prefers-reduced-motion:reduce){.ev-more svg{transition:none;}}
@@ -584,7 +588,7 @@ body{overflow:visible;}
 /* 1100px and wider: same balanced title wrap (no orphaned word), including the capped 1216px desktop frame */
 @media(min-width:1100px){
   #cover .cover-title{
-    font-size:clamp(34px,4.2vw,48px);
+    font-size:clamp(34px,4.3vw,52px);   /* the original's title is ~42% of the curve's width; this matches it */
     text-wrap:initial;
   }
   #cover .cover-title br{display:block;}
@@ -656,6 +660,22 @@ body{max-width:min(var(--frame-max,1216px), calc(100% - 16px));margin:8px auto !
 @media(min-width:1150px){.work-body.long{grid-template-columns:minmax(0,1fr) clamp(240px,25%,330px);}.work-body.long .ev-illo-inner{max-width:330px;}}
 @media(min-width:800px) and (max-width:1149px){.work-body.long{grid-template-columns:minmax(0,1fr) clamp(200px,26%,290px);}}
 @media(min-width:561px) and (max-width:799px){.work-body.long{grid-template-columns:minmax(0,1fr) clamp(150px,28%,230px);}}
+
+/* Cover icons at the original's proportions (measured from the original build: each icon has its own size,
+   e.g. the Soviet map and the plane are about twice the width of the helmet and China icons) */
+@media(min-width:681px){
+  #th-china {width:clamp(38px,8.8%,260px);}
+  #th-helmet{width:clamp(38px,9.5%,260px);}
+  #th-plane {width:clamp(38px,12.8%,260px);}
+  #th-ussr  {width:clamp(38px,14.3%,260px);}
+  #th-globe {width:clamp(38px,11.7%,260px);}
+}
+
+/* While the frame is being resized (Moodle side menus opening/closing) the content can briefly be taller than the iframe,
+   which flashes a scrollbar. Hide it just for that moment, only when embedded. */
+html.embedded.settling,html.embedded.settling body{overflow:hidden !important;}
+
+@media(min-width:1100px){ #cover .cover-text{max-width:clamp(300px,46%,600px);} }
 </style>
 </head>
 <body>
@@ -12697,6 +12717,25 @@ window.addEventListener('message',function(e){
   if(Math.abs(v-(CE_VP||0))<8) return;
   CE_VP=v; clearTimeout(_fitTimer); _fitTimer=setTimeout(fitScreens,120);
 });
+/* Where to cut the text: prefer the end of a paragraph (no fade needed); otherwise the end of a whole line, so a line of
+   text is never sliced through. Worked out from the live layout, so it is right whatever width/font the frame ended up with. */
+function evCutFor(de,limit){
+  var top=de.getBoundingClientRect().top, lh=parseFloat(getComputedStyle(de).lineHeight)||24;
+  var full=de.getBoundingClientRect().height, best=0, ps=de.children;
+  for(var q=0;q<ps.length;q++){ var bt=Math.ceil(ps[q].getBoundingClientRect().bottom-top); if(bt<=limit+6 && bt>=3*lh && bt<full-4) best=bt; }
+  if(best) return {h:best,fade:false};
+  var lines=[], tw=document.createTreeWalker(de,NodeFilter.SHOW_TEXT,null), n, r=document.createRange();
+  while((n=tw.nextNode())){ if(!n.nodeValue.trim()) continue; r.selectNodeContents(n);
+    [].forEach.call(r.getClientRects(),function(x){ if(x.height<2) return;
+      var t=x.top-top, bm=x.bottom-top, hit=false;
+      for(var k=0;k<lines.length;k++){ if(t<lines[k].b-2 && bm>lines[k].t+2){ lines[k].t=Math.min(lines[k].t,t); lines[k].b=Math.max(lines[k].b,bm); hit=true; break; } }
+      if(!hit) lines.push({t:t,b:bm}); }); }
+  lines.sort(function(a,b){return a.t-b.t;});
+  var idx=-1; for(var i=0;i<lines.length;i++){ if(lines[i].b<=limit+2) idx=i; }
+  if(idx<0) return {h:Math.round(limit),fade:true};
+  var cut=(idx+1<lines.length)?(lines[idx].b+lines[idx+1].t)/2:lines[idx].b;
+  return {h:Math.round(cut),fade:true};
+}
 function applyEvCollapse(){
   var de=document.getElementById('evDesc'), btn=document.getElementById('evMore'), lab=document.getElementById('evMoreLabel');
   if(!de||!btn) return;
@@ -12705,10 +12744,16 @@ function applyEvCollapse(){
   btn.hidden=false;
   var m=MS.find(function(x){return x.id===currentId;});
   if(evExpanded){ de.classList.remove('is-clamped'); de.style.maxHeight=''; lab.textContent='Show less'; btn.setAttribute('aria-expanded','true'); }
-  else { de.classList.add('is-clamped'); de.classList.toggle('no-fade',!!evSnap[currentId]); de.style.maxHeight=px+'px'; lab.textContent='Read more'; btn.setAttribute('aria-expanded','false'); }
+  else {
+    de.classList.remove('is-clamped'); de.style.maxHeight='';
+    var cut=evCutFor(de,px);
+    de.classList.add('is-clamped'); de.classList.toggle('no-fade',!cut.fade); de.style.maxHeight=cut.h+'px';
+    lab.textContent='Read more'; btn.setAttribute('aria-expanded','false');
+  }
   btn.setAttribute('aria-label',(evExpanded?'Show less: ':'Read more: ')+(m?m.title:''));
 }
-document.getElementById('evMore').addEventListener('click',function(){ evExpanded=!evExpanded; applyEvCollapse(); });
+
+document.getElementById('evMore').addEventListener('click',function(){ evExpanded=!evExpanded; if(window.ceSettle) window.ceSettle(); applyEvCollapse(); });
 function fitScreens(){
   var root=document.documentElement;
   var w=document.documentElement.clientWidth||window.innerWidth;
@@ -12783,6 +12828,14 @@ function scheduleFit(){
   },120);
 }
 window.addEventListener('resize', scheduleFit);
+(function(){
+  var emb=false; try{ emb=window.self!==window.top; }catch(e){ emb=true; }
+  if(!emb) return;
+  var root=document.documentElement, t;
+  root.classList.add('embedded');
+  window.ceSettle=function(){ root.classList.add('settling'); clearTimeout(t); t=setTimeout(function(){ root.classList.remove('settling'); },900); };
+  addEventListener('resize', window.ceSettle);
+})();
 if(window.ResizeObserver){
   var _widthObserver=new ResizeObserver(function(){
     var width=document.documentElement.clientWidth||window.innerWidth;
