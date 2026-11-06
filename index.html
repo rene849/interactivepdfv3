@@ -754,7 +754,7 @@ html.embedded.settling,html.embedded.settling body{overflow:hidden !important;}
              NOTE: source asset labels are mismatched, so each thumb is pointed
              at the asset that actually renders the intended icon (see thumbMap). -->
         <div id="th-china"  class="thumb" style="left:68.9%;top:31.7%;"></div>
-        <div id="th-helmet" class="thumb" style="left:81.5%;top:61.4%;"></div>
+        <div id="th-helmet" class="thumb" style="left:81.5%;top:53%;"></div>
         <div id="th-plane"  class="thumb" style="left:62.3%;top:61.4%;"></div>
         <div id="th-ussr"   class="thumb" style="left:55.2%;top:100.0%;"></div>
         <div id="th-globe"  class="thumb" style="left:89.0%;top:100.0%;"></div>
@@ -791,7 +791,7 @@ html.embedded.settling,html.embedded.settling body{overflow:hidden !important;}
         </div>
         <div class="intro-copy">
           <p id="introDesc">In the preceding decades, various events occurred that culminated in the US-China rivalry.</p>
-          <p>To understand how the rivalry reached its current state, <strong>select each event</strong> in the timeline below.</p>
+          <p>To understand how the rivalry reached its current state, <strong>click on each event</strong> in the timeline below.</p>
         </div>
       </div>
       <!-- Mobile-only accordion timeline (built by JS) -->
@@ -1893,7 +1893,7 @@ document.addEventListener('keydown',function(e){
   fitScreens();
   if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(function(){ cvFonts=true; tryStart(); }); } else { cvFonts=true; }
   tryStart();
-  setTimeout(startCover, 900);   /* never wait longer than this (parent without the viewport message, slow fonts) */
+  setTimeout(startCover, _embedded()?1600:900);   /* never wait longer than this (parent without the viewport message, slow fonts) */
 })();
 
 /* ── Auto height reporting to parent (Moodle) ───────────────────
