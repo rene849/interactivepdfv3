@@ -591,7 +591,7 @@ body{overflow:visible;}
 /* 1100px and wider: same balanced title wrap (no orphaned word), including the capped 1216px desktop frame */
 @media(min-width:1100px){
   #cover .cover-title{
-    font-size:clamp(34px,4.3vw,52px);   /* the original's title is ~42% of the curve's width; this matches it */
+    font-size:clamp(34px,4.3vw,48px);   /* capped at 48px for the 1120px card (52px was sized for the old 1216px frame) */
     text-wrap:initial;
   }
   #cover .cover-title br{display:block;}
@@ -660,6 +660,8 @@ body{margin:8px !important;border-radius:8px;box-shadow:var(--mb-shadow-frame);p
 /* ── FRAME WIDTH: standard 1120px card for all modules; fluid below that ── */
 /* min() keeps an 8px gutter either side at every width, so the frame's drop shadow is never cut off by the iframe edge */
 body{max-width:min(var(--frame-max,1120px), calc(100% - 16px));margin:8px auto !important;}
+/* EVENT HEADING: year on the left, title beside it (wrapping to two lines if long) instead of dropping under the year */
+@media(min-width:561px){.ev-head{flex-wrap:nowrap;align-items:baseline;align-items:last baseline;}.ev-title{flex:1 1 0;min-width:0;}}
 /* long descriptions: 75% text / 25% image */
 @media(min-width:1150px){.work-body.long{grid-template-columns:minmax(0,1fr) clamp(240px,25%,330px);}.work-body.long .ev-illo-inner{max-width:330px;}}
 @media(min-width:800px) and (max-width:1149px){.work-body.long{grid-template-columns:minmax(0,1fr) clamp(200px,26%,290px);}}
