@@ -1107,6 +1107,19 @@ function coverNodes(H){
     [s8+(x8-e[3]),       x8,  y[4]]
   ];
 }
+/* The icons sit on the road at fixed offsets (in the 1272-unit artwork space) from their row of the road. When the art is
+   stretched taller (narrow Moodle frames, side menus open) the rows move with H, so the icons must follow them. */
+var COVER_THUMB_ROW={'th-china':2,'th-helmet':3,'th-plane':3,'th-ussr':4,'th-globe':4};
+function placeCoverThumbs(H){
+  for(var id in COVER_THUMB_ROW){
+    var el=document.getElementById(id); if(!el) continue;
+    var row=COVER_THUMB_ROW[id];
+    if(el.getAttribute('data-dy')===null){   /* authored top (% of the 420-high art) -> offset from its road row */
+      el.setAttribute('data-dy',(parseFloat(el.style.top)/100*420-COVER_F[row]*420).toFixed(2));
+    }
+    el.style.top=((COVER_F[row]*H+parseFloat(el.getAttribute('data-dy')))/H*100).toFixed(3)+'%';
+  }
+}
 function layoutCover(){
   if(coverBusy){ coverRelayout=true; return; }          /* never reshape the road while it is drawing */
   var cover=document.getElementById('cover'), art=cover&&cover.querySelector('.cover-art');
@@ -1126,6 +1139,7 @@ function layoutCover(){
     if(Ha>Wa*420/1272*1.04) H=Math.min(756, Math.round(1272*Ha/Wa));   /* never stretch past 1.8x so the bends stay round */
   }
   if(H===420){ cover.style.removeProperty('--cover-ar'); } else { cover.style.setProperty('--cover-ar','1272 / '+H); }
+  placeCoverThumbs(H);   /* same step as the art's new height, so road and icons change together */
   if(+svg.getAttribute('data-h')===H) return;
   svg.setAttribute('data-h',H);
   svg.setAttribute('viewBox','0 0 1272 '+H);
@@ -1645,6 +1659,8 @@ function scheduleFit(){
   },120);
 }
 window.addEventListener('resize', scheduleFit);
+/* keep the cover art and its icons in step while the frame is being resized (side menus sliding open/closed) */
+(function(){var raf=0;window.addEventListener('resize',function(){if(raf)return;raf=requestAnimationFrame(function(){raf=0;layoutCover();});});})();
 (function(){
   var emb=false; try{ emb=window.self!==window.top; }catch(e){ emb=true; }
   if(!emb) return;
