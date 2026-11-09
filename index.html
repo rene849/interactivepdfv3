@@ -22,7 +22,7 @@
   --mb-shadow-offset-sm:0 4px 8px 0 rgba(13, 13, 13, 0.15); /* brand guide: Offset shadow (Small) */
   --mb-shadow-frame:var(--mb-shadow-offset-sm), 0 0 6px 0 rgba(13, 13, 13, 0.10); /* + faint ambient layer so the top edge is visible */
   --maxw:1120px;
-  --frame-max:1120px;   /* standard desktop card width across Modules 1-5 (M2's design width) */
+  --frame-max:1120px;   /* standard desktop card width across Modules 1-5 */
   --pad:clamp(18px,4vw,52px);
   --screen-height:580px;
   /* Force light rendering — illustrations designed for white background */
@@ -657,7 +657,7 @@ body{margin:8px !important;border-radius:8px;box-shadow:var(--mb-shadow-frame);p
   .ev-desc{line-height:1.5;}
 }
 
-/* ── FRAME WIDTH: standard 1120px card for all modules; fluid below that, never stretches across a wide Moodle page ── */
+/* ── FRAME WIDTH: standard 1120px card for all modules; fluid below that ── */
 /* min() keeps an 8px gutter either side at every width, so the frame's drop shadow is never cut off by the iframe edge */
 body{max-width:min(var(--frame-max,1120px), calc(100% - 16px));margin:8px auto !important;}
 /* long descriptions: 75% text / 25% image */
