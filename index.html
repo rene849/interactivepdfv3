@@ -526,6 +526,9 @@ body{overflow:visible;}
   .acc-meta{display:flex;flex-direction:column;padding-top:6px;gap:3px;}
   .acc-year{font-size:15px;font-weight:700;color:var(--ink);}
   .acc-title{font-size:15px;font-weight:400;color:var(--ink);line-height:1.35;}
+  /* open item: the large year/title in the panel replaces the compact ones, so they only appear once (as in the original).
+     The row keeps its accessible name (aria-label), so nothing is lost for screen readers. */
+  .acc-item.open .acc-meta{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
 
   /* expanded panel */
   .acc-panel{display:none;padding:8px 0 20px;height:var(--acc-h,auto);overflow:hidden;}
@@ -1017,7 +1020,9 @@ function sizeIlloToAsset(containerId, assetName){
   var REF = 340;
   var ratio = actualWidth / REF;
   var x = fix.x * ratio, y = fix.y * ratio;
-  svg.style.transform = 'translate('+x.toFixed(1)+'px,'+y.toFixed(1)+'px) scale('+fix.s.toFixed(3)+')';
+  var sc = fix.s;
+  if((document.documentElement.clientWidth||window.innerWidth)<=560 && (ASSET_ALIAS[assetName]||assetName)==='2000') sc *= 1.15;   /* phone: the ship read smaller than the other artworks */
+  svg.style.transform = 'translate('+x.toFixed(1)+'px,'+y.toFixed(1)+'px) scale('+sc.toFixed(3)+')';
   svg.style.transformOrigin = 'center';
   svg.style.pointerEvents = 'none';
 }
@@ -1461,8 +1466,10 @@ function buildAccordion(){
     /* compact, clickable row */
     var row=document.createElement('button');
     row.className='acc-row'; row.type='button';
+    row.id='acc-row-'+m.id;
     row.setAttribute('aria-expanded','false');
     row.setAttribute('aria-controls','acc-panel-'+m.id);
+    row.setAttribute('aria-label','Event '+m.id+', '+m.year+': '+m.title);   /* same name as the desktop timeline buttons */
 
     var numWrap=document.createElement('span'); numWrap.className='acc-numwrap';
     var num=document.createElement('span'); num.className='acc-num'; num.textContent=m.id;
@@ -1471,22 +1478,20 @@ function buildAccordion(){
     var meta=document.createElement('span'); meta.className='acc-meta';
     var yr=document.createElement('span'); yr.className='acc-year'; yr.textContent=m.year;
     var tl=document.createElement('span'); tl.className='acc-title'; tl.textContent=m.title;
-    var sep2=document.createElement('span'); sep2.className='sr-only'; sep2.textContent=': ';
-    meta.appendChild(yr); meta.appendChild(sep2); meta.appendChild(tl);
-
-    var sep1=document.createElement('span'); sep1.className='sr-only'; sep1.textContent=', ';
-    row.appendChild(numWrap); row.appendChild(sep1); row.appendChild(meta);
+    meta.appendChild(yr); meta.appendChild(tl);
+    row.appendChild(numWrap); row.appendChild(meta);
     row.addEventListener('click',function(){ toggleAcc(m.id); });
 
     /* expanded panel */
     var panel=document.createElement('div'); panel.className='acc-panel'; panel.id='acc-panel-'+m.id;
+    panel.setAttribute('role','region'); panel.setAttribute('aria-labelledby','acc-row-'+m.id);
     var illo=document.createElement('div'); illo.className='acc-illo'; illo.setAttribute('aria-hidden','true');
     var illoInner=document.createElement('div'); illoInner.className='acc-illo-inner';
     illoInner.id='acc-illo-'+m.id;
     illo.appendChild(illoInner);
 
-    var yrLg=document.createElement('div'); yrLg.className='acc-year-lg'; yrLg.textContent=m.year;
-    var tlLg=document.createElement('div'); tlLg.className='acc-title-lg'; tlLg.textContent=m.title;
+    var yrLg=document.createElement('div'); yrLg.className='acc-year-lg'; yrLg.textContent=m.year; yrLg.setAttribute('aria-hidden','true');   /* the row's name already says year + title */
+    var tlLg=document.createElement('div'); tlLg.className='acc-title-lg'; tlLg.textContent=m.title; tlLg.setAttribute('aria-hidden','true');
     var dsc=document.createElement('div'); dsc.className='acc-desc'; setParas(dsc,m.desc);
 
     panel.appendChild(illo); panel.appendChild(yrLg);
@@ -1770,14 +1775,31 @@ function selectEvent(id){
 }
 
 /* ── Navigation ──────────────────────────────────────────────── */
+function collapseAcc(){
+  var any=false;
+  document.querySelectorAll('#mobileTimeline .acc-item.open').forEach(function(it){
+    any=true; it.classList.remove('open');
+    var r=it.querySelector('.acc-row'); if(r) r.setAttribute('aria-expanded','false');
+  });
+  return any;
+}
 function goIntro(){
   // Reset so S-curve always redraws when returning to intro screen
   introDrawn = false;
   document.getElementById('introSvg').innerHTML = '';
+  /* Phone: the timeline is the accordion on this same screen, so "Return to timeline" closes any open event
+     and brings the top of the timeline back into view (it used to do nothing visible). */
+  var phone=(document.documentElement.clientWidth||window.innerWidth)<=560;
+  var closed=phone && collapseAcc();
   show('intro');
   drawIntro();
   setActive(-1);
   focusHeading('intro');
+  if(phone){
+    if(closed) announce('Event closed. All events are shown in the timeline.');
+    try{ window.parent.postMessage({type:'ce-top',app:'ce-interactive'},'*'); }catch(e){}
+    setTimeout(function(){ try{ window.parent.postMessage({type:'ce-top',app:'ce-interactive'},'*'); }catch(e){} },300);   /* again once the page has shrunk */
+  }
 }
 function goHome(){
   introDrawn=false;
@@ -1944,7 +1966,7 @@ document.addEventListener('keydown',function(e){
      listener may attach after this frame has already posted its first size). */
   [150,500,1200,2500,5000].forEach(function(t){ setTimeout(function(){ _report(true); }, t); });
   /* ask the parent for the visible viewport height (see the Moodle snippet) */
-  function hello(){ try{ window.parent.postMessage({type:'ce-ready',app:'ce-interactive'},'*'); }catch(e){} }
+  function hello(){ try{ window.parent.postMessage({type:'ce-ready',app:'ce-interactive'},'*'); window.parent.postMessage({type:'ce-title',app:'ce-interactive',title:document.title},'*'); }catch(e){} }
   hello(); setTimeout(hello,600); setTimeout(hello,2500); window.addEventListener('pageshow',hello);
   window.addEventListener('pageshow', function(){ _report(true); });
   document.addEventListener('visibilitychange', function(){ if(!document.hidden) _report(true); });
