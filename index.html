@@ -91,7 +91,7 @@ body{overflow:visible;}
   --ring:var(--blue); --ring-fill:transparent; --glyph:var(--blue);
   width:var(--icon);height:var(--icon);padding:0;border:0;background:none;
   cursor:pointer;flex:none;display:block;border-radius:50%;
-  transition:none;
+  transition:none;position:relative;
 }
 .icon-btn svg{width:100%;height:100%;display:block;overflow:visible;}
 .icon-btn .ring{fill:var(--ring-fill);stroke:var(--ring);stroke-width:1;}
@@ -310,7 +310,7 @@ body{overflow:visible;}
   width:40px;height:40px;
   border-radius:50%;border:1.5px solid var(--blue);background:#fff;
   color:var(--blue);font-weight:700;font-size:15px;
-  flex-shrink:0;display:grid;place-items:center;cursor:pointer;
+  flex-shrink:0;display:grid;place-items:center;cursor:pointer;position:relative;
   padding:var(--tl-pt,0px) 0 var(--tl-pb,0px);   /* optical centring of the number, measured from the real font in nudgeTl() */
   transition:background .1s,border-color .1s;
 }
@@ -329,7 +329,7 @@ body{overflow:visible;}
   background:var(--navy-deep)!important;color:#fff!important;
   border:2px solid var(--teal);box-shadow:none;transform:none;
 }
-.tl-year{font-size:13px;font-weight:700;color:var(--ink);margin-top:3px;white-space:nowrap;
+.tl-year{font-size:14px;font-weight:700;color:var(--ink);margin-top:3px;white-space:nowrap;
   transform-origin:50% 50%;transition:transform .2s ease;}
 .tl-btn:focus-visible + .tl-node-text .tl-year{transform:scale(1.13);}
 @media (hover:hover){ .tl-btn:hover + .tl-node-text .tl-year{transform:scale(1.13);} }
@@ -388,15 +388,23 @@ body{overflow:visible;}
 .bib-entry{margin:0 0 14px;padding:0 0 0 18px;text-indent:-18px;border:0;overflow-wrap:anywhere;}
 .bib-entry:last-child{margin-bottom:0;}
 
-@media(max-width:560px){
+@media(max-width:690px){
   .bib-box{padding:20px 16px 24px 20px;height:min(560px,100%);}
   .bib-head h2{font-size:20px;}
 }
-/* ── MOBILE ≤560px ──
+/* Back to top: phone only (matches M2's mobile bibliography) */
+.bib-top{display:none;}
+@media(max-width:690px){
+  .bib-top{display:flex;align-items:center;justify-content:center;width:100%;min-height:48px;margin-top:16px;padding:0 28px;
+    background:#fff;color:var(--blue);border:1.5px solid var(--blue);border-radius:4px;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+  .bib-top:active{background:var(--tint);}
+}
+@media (forced-colors:active){ .bib-top{border-color:ButtonText;} }
+/* ── MOBILE ≤690px ──
    Lowered from 700px so a laptop with a Moodle side menu open (which can
    shrink the iframe below the old 700px threshold) stays in the laptop
    layout — reserved now for genuinely small/phone screens. */
-/* ── TABLET BAND (e.g. iPad Mini portrait, ~561–900px): still the
+/* ── TABLET BAND (e.g. iPad Mini portrait, ~691–900px): still the
    desktop-style layout (horizontal timeline, side-by-side event columns —
    both already checked fine at this width). The intro screen's decorative
    S-curve is dropped at this width, same as mobile: there isn't enough
@@ -406,17 +414,17 @@ body{overflow:visible;}
    screen compact. The 15-node timeline strip itself is also tightened a
    touch — smaller circles/year text and a smaller minimum side margin —
    so all 15 nodes keep comfortable, even spacing instead of crowding. ── */
-@media(min-width:561px) and (max-width:900px){
+@media(min-width:691px) and (max-width:900px){
 
   .tl-inner-wrap{padding:0 clamp(10px,2.4vw,28px);}
   .tl-btn{width:34px;height:34px;font-size:14px;}
-  .tl-year{font-size:12px;}
+  .tl-year{font-size:14px;}
   .tl-conn{margin-top:16px;}
 }
 
-/* 561–799px (both Moodle side menus open): same side-by-side layout as desktop,
+/* 691–799px (both Moodle side menus open): same side-by-side layout as desktop,
    just scaled. Text stays inside the left ~44% so it never meets the curve. */
-@media(min-width:561px) and (max-width:799px){
+@media(min-width:691px) and (max-width:799px){
   .cover-text{max-width:44%;}
   .cover-title{font-size:clamp(26px,4.4vw,34px);margin-bottom:24px;}
   .intro-copy{max-width:44%;}
@@ -430,12 +438,12 @@ body{overflow:visible;}
   .intro-copy{max-width:41%;}
   .work-body{grid-template-columns:minmax(0,1fr) clamp(170px,25%,250px);gap:28px;}
 }
-@media(min-width:561px) and (max-width:799px){
+@media(min-width:691px) and (max-width:799px){
   .ev-desc,.intro-copy p{line-height:1.6;}
   .work-body{grid-template-columns:minmax(0,1fr) clamp(130px,24%,190px);gap:20px;}
 }
 
-@media(max-width:560px){
+@media(max-width:690px){
   html,body{overflow:auto;height:auto;}
   .screen{overflow:visible;}
   .screen.is-active{min-height:0;}
@@ -568,7 +576,7 @@ body{overflow:visible;}
 /* ── Narrow and medium frames (side menus open) ──
    Cover and instruction slides use the desktop arrangement, scaled. Only the
    event screen needs its own alignment tweak here. */
-@media(min-width:561px) and (max-width:1099px){
+@media(min-width:691px) and (max-width:1099px){
   .work-body{align-items:start;}
   .ev-illo{align-self:start;}
   /* cover: wider curve (tighter side padding), full-size Start button, more air under the title */
@@ -578,10 +586,10 @@ body{overflow:visible;}
   #cover .btn-start{min-width:156px;}
 }
 /* Intro curve: when the visible area is short its height is capped (right-aligned, scaled uniformly) */
-@media(min-width:561px){.intro-bg{max-width:calc(var(--intro-art-h,9999px) * 1284 / 392);justify-self:end;}}
-/* Narrow tablet-type frames (561–680px): the phone-style stacked cover, drawn larger.
+@media(min-width:691px){.intro-bg{max-width:calc(var(--intro-art-h,9999px) * 1284 / 392);justify-self:end;}}
+/* Narrow tablet-type frames (561–690px): the phone-style stacked cover, drawn larger.
    A wide animated curve is too small and a tall one too thin here; the stacked art is the right shape. */
-@media(min-width:561px) and (max-width:680px){
+@media(min-width:561px) and (max-width:690px){
   #cover .cover-art{display:none;}
   #cover .cover-stage{display:flex;flex-direction:column;justify-content:center;flex:1;width:100%;max-width:none;padding:28px 28px 32px;}
   #cover .cover-text{display:flex;flex-direction:column;flex:none;max-width:none;align-self:stretch;}
@@ -602,7 +610,7 @@ body{overflow:visible;}
 }
 /* Phone frames: full width. The graphic spans the frame, title sits at the top
    and the Start button at the bottom. */
-@media(max-width:560px){
+@media(max-width:690px){
   /* Spacing/scale taken from the original cover: 32px title in 3 lines, 27px to the art,
      art box 256x230 at the button's width, 42px to a 47px-high button. All scale with width. */
   #cover,#cover.is-active{min-height:0;}
@@ -618,12 +626,12 @@ body{margin:8px !important;border-radius:8px;box-shadow:var(--mb-shadow-frame);p
 /* Phones: the page always reserves its scrollbar, so text width (and therefore
    height) cannot change when the content length changes — this stops the
    scrollbar-driven width/height loop that made headings twitch. */
-@media(max-width:560px){ html{overflow-y:auto;scrollbar-width:none;} html::-webkit-scrollbar{display:none;} }
+@media(max-width:690px){ html{overflow-y:auto;scrollbar-width:none;} html::-webkit-scrollbar{display:none;} }
 
 /* ── One-menu desktop widths (1100–1399px): scale the medium arrangement ── */
 #cover .appbar-title{display:none;}
 /* Phones: each open event sits at its own height (no empty space under short ones). */
-@media(max-width:560px){ .acc-panel{height:auto !important;padding-bottom:12px;} }
+@media(max-width:690px){ .acc-panel{height:auto !important;padding-bottom:12px;} }
 .ev-illo{align-self:start;}
 @media(min-width:1150px){.work-body{grid-template-columns:minmax(0,1fr) clamp(240px,24%,340px);gap:clamp(28px,3.5vw,44px);}.ev-illo-inner{max-width:340px;}}
 @media(min-width:800px){
@@ -637,8 +645,8 @@ body{margin:8px !important;border-radius:8px;box-shadow:var(--mb-shadow-frame);p
    large enough to hold the slide instead of sitting as a thin strip next to the text. The content
    block is centred between the top bar and the timeline, the image is centred against the heading
    + text block, and the tallest slide (1972) gets slightly tighter spacing so every slide can share
-   a shorter frame. Phone (≤560px) layout is untouched. */
-@media(min-width:561px){
+   a shorter frame. Phone (≤690px) layout is untouched. */
+@media(min-width:691px){
   .work-body{align-content:center;}
   #eventOuter .ev-illo{align-self:center;}
   #eventOuter .ev-text{align-self:center;}   /* text block and artwork share one centre line (was: text pinned to the top, artwork centred) */
@@ -655,7 +663,7 @@ body{margin:8px !important;border-radius:8px;box-shadow:var(--mb-shadow-frame);p
   .ev-illo-inner{max-width:340px;}
   .ev-desc{line-height:1.5;}
 }
-@media(min-width:561px) and (max-width:799px){
+@media(min-width:691px) and (max-width:799px){
   .work-body{grid-template-columns:minmax(0,1fr) clamp(170px,34%,270px);gap:22px;}
   .ev-illo-inner{max-width:270px;}
   .ev-desc{line-height:1.5;}
@@ -665,15 +673,15 @@ body{margin:8px !important;border-radius:8px;box-shadow:var(--mb-shadow-frame);p
 /* min() keeps an 8px gutter either side at every width, so the frame's drop shadow is never cut off by the iframe edge */
 body{max-width:min(var(--frame-max,1120px), calc(100% - 16px));margin:8px auto !important;}
 /* EVENT HEADING: year on the left, title beside it (wrapping to two lines if long) instead of dropping under the year */
-@media(min-width:561px){.ev-head{flex-wrap:nowrap;align-items:baseline;align-items:last baseline;}.ev-title{flex:1 1 0;min-width:0;}}
+@media(min-width:691px){.ev-head{flex-wrap:nowrap;align-items:baseline;align-items:last baseline;}.ev-title{flex:1 1 0;min-width:0;}}
 /* long descriptions: 75% text / 25% image */
 @media(min-width:1150px){.work-body.long{grid-template-columns:minmax(0,1fr) clamp(240px,25%,330px);}.work-body.long .ev-illo-inner{max-width:330px;}}
 @media(min-width:800px) and (max-width:1149px){.work-body.long{grid-template-columns:minmax(0,1fr) clamp(200px,26%,290px);}}
-@media(min-width:561px) and (max-width:799px){.work-body.long{grid-template-columns:minmax(0,1fr) clamp(150px,28%,230px);}}
+@media(min-width:691px) and (max-width:799px){.work-body.long{grid-template-columns:minmax(0,1fr) clamp(150px,28%,230px);}}
 
 /* Cover icons at the original's proportions (measured from the original build: each icon has its own size,
    e.g. the Soviet map and the plane are about twice the width of the helmet and China icons) */
-@media(min-width:681px){
+@media(min-width:691px){
   #th-china {width:clamp(38px,8.8%,260px);}
   #th-helmet{width:clamp(38px,9.5%,260px);}
   #th-plane {width:clamp(38px,12.8%,260px);}
@@ -700,9 +708,17 @@ html.embedded.settling,html.embedded.settling body{overflow:hidden !important;}
   :focus-visible{outline-color:Highlight;}
 }
 /* the parent resizes the frame to the content, so no internal scrollbar is ever wanted (a flickering one changed the width and re-triggered layout) */
-@media(min-width:561px){html.embedded,html.embedded body{overflow-y:hidden;}}
+@media(min-width:691px){html.embedded,html.embedded body{overflow-y:hidden;}}
 
 @media(min-width:1100px){ #cover .cover-text{max-width:clamp(300px,46%,600px);} }
+
+/* Touch devices: invisible hit-area padding so every control is at least 44x44 CSS px — no visual change */
+@media (pointer:coarse){
+  .icon-btn::after,.tl-btn::after{content:"";position:absolute;inset:-2px;}
+}
+@media (pointer:coarse) and (min-width:691px) and (max-width:900px){
+  .tl-btn::after{inset:-5px;}
+}
 </style>
 </head>
 <body>
@@ -1025,7 +1041,7 @@ function sizeIlloToAsset(containerId, assetName){
   var ratio = actualWidth / REF;
   var x = fix.x * ratio, y = fix.y * ratio;
   var sc = fix.s;
-  if((document.documentElement.clientWidth||window.innerWidth)<=560 && (ASSET_ALIAS[assetName]||assetName)==='2000') sc *= 1.15;   /* phone: the ship read smaller than the other artworks */
+  if((document.documentElement.clientWidth||window.innerWidth)<=690 && (ASSET_ALIAS[assetName]||assetName)==='2000') sc *= 1.15;   /* phone: the ship read smaller than the other artworks */
   svg.style.transform = 'translate('+x.toFixed(1)+'px,'+y.toFixed(1)+'px) scale('+sc.toFixed(3)+')';
   svg.style.transformOrigin = 'center';
   svg.style.pointerEvents = 'none';
@@ -1138,8 +1154,8 @@ function layoutCover(){
   if(!Wa) return;                                        /* cover not on screen yet */
   var H=420;
   var over=Math.round(Math.min(84,Math.max(38,.07*Wa))*.5);          /* how far the lowest icons hang below the curve */
-  cover.style.setProperty('--cv-over',(w>560?over:0)+'px');
-  if(w>560 && w<=COVER_FIT_MAX_W){
+  cover.style.setProperty('--cv-over',(w>690?over:0)+'px');
+  if(w>690 && w<=COVER_FIT_MAX_W){
     var stage=cover.querySelector('.cover-stage'), cs=stage?getComputedStyle(stage):null;
     var padV=cs?(parseFloat(cs.paddingTop)+parseFloat(cs.paddingBottom)):40;
     var smin=parseFloat(document.documentElement.style.getPropertyValue('--screen-min'))||0;
@@ -1273,7 +1289,7 @@ var introRunId = 0;
 /* Medium/narrow frames: same three-run curve, drawn taller (1200 x 1000) so the
    box can fill the right-hand column without distorting the arcs or dots. */
 var INTRO_D_TALL = "M 0 90 H 940 a60 220 0 0 1 0 440 H 600 a60 220 0 0 0 0 440 H 1199";
-function introIsMid(){ var w=window.innerWidth; return w>=561 && w<=1099; }
+function introIsMid(){ var w=window.innerWidth; return w>=691 && w<=1099; }
 function introIsWide(){ var w=window.innerWidth; return w>=1100 && w<=1399; }
 /* The S-curve shared by the cover and the instruction slide: five runs and four
    turns, placed by fraction of the box height so any height keeps the same
@@ -1563,7 +1579,7 @@ function evCutFor(de,limit){
 function applyEvCollapse(){
   var de=document.getElementById('evDesc'), btn=document.getElementById('evMore'), lab=document.getElementById('evMoreLabel');
   if(!de||!btn) return;
-  var px=(window.innerWidth>560)?evCollapse[currentId]:0;
+  var px=(window.innerWidth>690)?evCollapse[currentId]:0;
   if(!px){ de.classList.remove('is-clamped'); de.style.maxHeight=''; btn.hidden=true; evExpanded=false; return; }
   btn.hidden=false;
   var m=MS.find(function(x){return x.id===currentId;});
@@ -1597,7 +1613,7 @@ function fitScreens(){
   var root=document.documentElement;
   nudgeTl();
   var w=document.documentElement.clientWidth||window.innerWidth;
-  if(w<=560){ root.style.setProperty('--screen-min','620px'); evCollapse={}; applyEvCollapse(); return; } /* phone: cover fills 620px; intro scrolls */
+  if(w<=690){ root.style.setProperty('--screen-min','620px'); evCollapse={}; applyEvCollapse(); return; } /* phone: cover fills 620px; intro scrolls */
   var base = w>=1100 ? 634 : (w>=1000 ? 614 : (w>=800 ? 578 : 640));   /* matches M5's frame height at the same widths */
   var cap = Math.max(480, usableH()-48);        /* tallest screen that still fits the visible area */
   base = Math.min(base, cap);
@@ -1793,7 +1809,7 @@ function goIntro(){
   document.getElementById('introSvg').innerHTML = '';
   /* Phone: the timeline is the accordion on this same screen, so "Return to timeline" closes any open event
      and brings the top of the timeline back into view (it used to do nothing visible). */
-  var phone=(document.documentElement.clientWidth||window.innerWidth)<=560;
+  var phone=(document.documentElement.clientWidth||window.innerWidth)<=690;
   var closed=phone && collapseAcc();
   show('intro');
   drawIntro();
@@ -1891,6 +1907,12 @@ document.addEventListener('keydown',function(e){
     var p=document.createElement('p'); p.className='bib-entry';
     p.innerHTML=b; bibBody.appendChild(p);
   });
+  var topBtn=document.createElement('button'); topBtn.type='button'; topBtn.className='bib-top'; topBtn.textContent='Back to top';
+  topBtn.addEventListener('click',function(){
+    bibBody.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});
+    var h=document.getElementById('bibTitle'); if(h){ h.setAttribute('tabindex','-1'); h.focus({preventScroll:true}); }
+  });
+  bibBody.appendChild(topBtn);
 
   // Inject cover thumbnails.
   // NOTE: the source asset labels are mismatched (e.g. data-ill="globe"
