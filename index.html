@@ -33,7 +33,7 @@
 html, body{background:#fff !important;color:var(--ink) !important;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
-body{font-family:'Noto Sans',Arial,sans-serif;background:#fff;
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";background:#fff;
   color:var(--ink);-webkit-font-smoothing:antialiased;}
 button{font-family:inherit;cursor:pointer;border:none;background:none;touch-action:manipulation;}
 :focus-visible{outline:3px solid var(--red);outline-offset:3px;border-radius:2px;}
@@ -131,7 +131,7 @@ body{overflow:visible;}
   display:inline-flex;align-items:center;justify-content:center;
   background:var(--blue);color:#fff;font-weight:700;font-size:16px;
   min-width:156px;height:48px;padding:0 28px;
-  border-radius:4px;cursor:pointer;transition:background .12s,box-shadow .12s;}
+  border-radius:8px;cursor:pointer;transition:background .12s,box-shadow .12s;}
 .btn-start:hover,.btn-start:focus-visible{background:var(--navy);}
 /* selected / pressed: navy fill with the teal 2px outline (same teal as the icon buttons' pressed state) */
 .btn-start:active{background:var(--navy);box-shadow:0 0 0 2px var(--teal);}
@@ -250,7 +250,7 @@ body{overflow:visible;}
 .ev-desc.is-clamped.no-fade{-webkit-mask-image:none;mask-image:none;}
 /* "Read more" is a proper button: same 4px corners as Start, blue outline and text like the timeline numbers */
 .ev-more{display:inline-flex;align-self:flex-start;justify-self:start;width:fit-content;align-items:center;gap:10px;margin-top:14px;padding:0 18px;min-height:44px;background:#fff;
-  border:1.5px solid var(--blue);border-radius:4px;color:var(--blue);font:inherit;font-size:15px;font-weight:700;cursor:pointer;
+  border:1.5px solid var(--blue);border-radius:8px;color:var(--blue);font:inherit;font-size:15px;font-weight:700;cursor:pointer;
   transition:background .1s,border-color .1s;}
 .ev-more[hidden]{display:none;}
 .ev-more:hover,.ev-more:focus-visible{background:#e6eaee;}
@@ -396,7 +396,7 @@ body{overflow:visible;}
 .bib-top{display:none;}
 @media(max-width:690px){
   .bib-top{display:flex;align-items:center;justify-content:center;width:100%;min-height:48px;margin-top:16px;padding:0 28px;
-    background:#fff;color:var(--blue);border:1.5px solid var(--blue);border-radius:4px;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+    background:#fff;color:var(--blue);border:1.5px solid var(--blue);border-radius:8px;font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;}
   .bib-top:active{background:var(--tint);}
 }
 @media (forced-colors:active){ .bib-top{border-color:ButtonText;} }
