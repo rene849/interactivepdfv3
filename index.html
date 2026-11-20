@@ -122,6 +122,7 @@ body{overflow:visible;}
 .cover-text{
   grid-area:1/1;align-self:center;justify-self:start;
   position:relative;z-index:5;max-width:clamp(300px,42%,560px);
+  margin-top:var(--cv-over,0px);   /* keeps title + Start centred in the frame although the stage reserves room under the art */
 }
 .nb{white-space:nowrap;}
 .cover-title{font-size:clamp(34px,4.2vw,56px);font-weight:700;
@@ -581,7 +582,8 @@ body{overflow:visible;}
   .ev-illo{align-self:start;}
   /* cover: wider curve (tighter side padding), full-size Start button, more air under the title */
   #cover .cover-stage{padding-left:20px;padding-right:20px;}
-  #cover .cover-title{margin-bottom:28px;text-wrap:balance;}
+  #cover .cover-text{padding-left:max(0px,calc(clamp(18px,4vw,52px) - 20px));}   /* the curve stays wide, the title still starts at --pad like the other modules */
+  #cover .cover-title{margin-bottom:24px;text-wrap:balance;}
   #cover .cover-title br{display:none;}
   #cover .btn-start{min-width:156px;}
 }
@@ -1614,7 +1616,7 @@ function fitScreens(){
   nudgeTl();
   var w=document.documentElement.clientWidth||window.innerWidth;
   if(w<=690){ root.style.setProperty('--screen-min','620px'); evCollapse={}; applyEvCollapse(); return; } /* phone: cover fills 620px; intro scrolls */
-  var base = w>=1100 ? 634 : (w>=1000 ? 614 : (w>=800 ? 578 : 640));   /* matches M5's frame height at the same widths */
+  var base = w>=1100 ? 644 : (w>=1000 ? 614 : 578);   /* same frame height in all four modules */
   var cap = Math.max(480, usableH()-48);        /* tallest screen that still fits the visible area */
   base = Math.min(base, cap);
   if(!coverBusy) document.getElementById('cover').style.removeProperty('--cover-ar');   /* measure the cover at its natural size */
@@ -1836,13 +1838,13 @@ function openBib(){
   _bibOpener = document.activeElement; // remember so we can return focus
   var modal = document.getElementById('bibModal');
   modal.classList.add('open');
-  ['cover','intro','event'].forEach(function(i){ document.getElementById(i).setAttribute('inert',''); });
+  ['cover','intro','event'].forEach(function(i){ document.getElementById(i).setAttribute('inert',''); document.getElementById(i).setAttribute('aria-hidden','true'); });
   var bibBox=document.querySelector('.bib-box'); bibBox.setAttribute('tabindex','-1'); bibBox.focus();
 }
 
 function closeBib(){
   document.getElementById('bibModal').classList.remove('open');
-  ['cover','intro','event'].forEach(function(i){ document.getElementById(i).removeAttribute('inert'); });
+  ['cover','intro','event'].forEach(function(i){ document.getElementById(i).removeAttribute('inert'); document.getElementById(i).removeAttribute('aria-hidden'); });
   // Return focus to whichever button opened the modal
   if(_bibOpener && typeof _bibOpener.focus === 'function'){
     _bibOpener.focus();
