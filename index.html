@@ -1616,7 +1616,7 @@ function fitScreens(){
   nudgeTl();
   var w=document.documentElement.clientWidth||window.innerWidth;
   if(w<=690){ root.style.setProperty('--screen-min','620px'); evCollapse={}; applyEvCollapse(); return; } /* phone: cover fills 620px; intro scrolls */
-  var base = w>=1100 ? 644 : (w>=1000 ? 614 : 578);   /* same frame height in all four modules */
+  var base = 610;   /* same frame height in all four modules */
   var cap = Math.max(480, usableH()-48);        /* tallest screen that still fits the visible area */
   base = Math.min(base, cap);
   if(!coverBusy) document.getElementById('cover').style.removeProperty('--cover-ar');   /* measure the cover at its natural size */
