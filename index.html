@@ -1651,7 +1651,7 @@ function fitScreens(){
   });
   /* 2. frame budget: the 4th-longest event, kept within what the viewport can show */
   var sorted=nat.slice().sort(function(a,b){return b-a;});
-  var Ht=Math.min(base,cap), slack=24;   /* every event is fitted to the shared frame height (long ones get Read more) */   /* when the visible area is the limit, trim even small overflows */
+  var Ht=Math.min(base,cap), slack=0;   /* every event is fitted to the shared frame height (long ones get Read more) */   /* when the visible area is the limit, trim even small overflows */
   var lineH=parseFloat(getComputedStyle(de).lineHeight)||26;
   evCollapse={}; evSnap={};
   MS.forEach(function(m,i){
@@ -1666,7 +1666,7 @@ function fitScreens(){
     for(var q=0;q<ps.length;q++){ var bt=Math.ceil(ps[q].getBoundingClientRect().bottom-top0); if(bt<=cut+6 && bt>=4*lineH) snap=bt; }
     if(snap && snap<full-4){ cut=snap; } else { snap=0; }
     de.style.maxHeight=cut+'px'; hAt=Math.ceil(ev.getBoundingClientRect().height);
-    if(nat[i]-hAt<40){                                              /* saves under ~2 lines: not worth hiding any text */
+    if(nat[i]-hAt<12){                                              /* saves under ~2 lines: not worth hiding any text */
       de.classList.remove('is-clamped'); de.style.maxHeight=''; btn.hidden=true; max=Math.max(max,nat[i]); return;
     }
     evCollapse[m.id]=cut; evSnap[m.id]=!!snap; max=Math.max(max,hAt);
@@ -2026,6 +2026,31 @@ document.addEventListener('keydown',function(e){
     setTimeout(reportHeight, 300); // settle after injected SVGs
   });
   reportHeight();
+})();
+</script>
+<script>
+/* Focus visibility inside the Moodle page: tells the Moodle snippet where keyboard focus / the screen-reader cursor is,
+   so it can scroll just enough to clear Moodle's fixed header (WCAG 2.4.11). No message is sent for mouse use. */
+(function(){
+  if(window.self===window.top) return;
+  var timer, lastPointer=0;
+  addEventListener('pointerdown',function(){ lastPointer=Date.now(); },true);
+  function rectOf(){
+    var a=document.activeElement, r=null;
+    if(a && a!==document.body && a!==document.documentElement && !(a.closest && a.closest('[inert]'))) r=a.getBoundingClientRect();
+    else { var s=getSelection&&getSelection(); if(s && s.rangeCount && !s.isCollapsed){ r=s.getRangeAt(0).getBoundingClientRect(); } else if(s && s.rangeCount){ var n=s.anchorNode&&(s.anchorNode.nodeType===1?s.anchorNode:s.anchorNode.parentElement); if(n) r=n.getBoundingClientRect(); } }
+    return r;
+  }
+  function report(){
+    if(Date.now()-lastPointer<600) return;
+    clearTimeout(timer);
+    timer=setTimeout(function(){
+      var r=rectOf(); if(!r || (!r.width && !r.height)) return;
+      try{ window.parent.postMessage({type:'ce-focus',app:'ce-interactive',top:Math.round(r.top),bottom:Math.round(r.bottom)},'*'); }catch(e){}
+    },120);
+  }
+  document.addEventListener('focusin',report,true);
+  document.addEventListener('selectionchange',report);
 })();
 </script>
 </body>
