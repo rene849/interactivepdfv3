@@ -2053,5 +2053,16 @@ document.addEventListener('keydown',function(e){
   document.addEventListener('selectionchange',report);
 })();
 </script>
+<style id="phone-cover-standard">
+/* PHONE COVER STANDARD (same in all four modules): 560px frame, 28px top/bottom and 20px side padding,
+   title at the top, art centred in the space between, full-width 48px Start at the bottom. */
+@media(max-width:690px){
+ #cover .cover-stage{min-height:560px;padding:28px 20px 28px;justify-content:flex-start}
+ #cover .cover-text{flex:1 1 auto;min-height:0}
+ #cover .cover-title{font-size:clamp(26px,10.25vw,40px);line-height:1.35;margin:0 0 16px}
+ #cover .cover-art-mobile{flex:1 1 0;min-height:0;width:auto;max-width:100%;max-height:calc((100vw - 56px) * 230 / 256);aspect-ratio:256/230;align-self:center;margin:auto 0}
+ #cover .btn-start{width:100%;max-width:none;align-self:stretch;height:48px;margin:16px 0 0}
+}
+</style>
 </body>
 </html>
